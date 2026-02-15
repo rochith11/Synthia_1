@@ -1,29 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Synthia{% endblock %}</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-  </head>
-  <body>
-    <nav>
-      <div class="container">
-        <a href="{{ url_for('index') }}" class="brand">Synthia</a>
-        <a href="{{ url_for('index') }}">Generate</a>
-        <a href="{{ url_for('results') }}">Results</a>
-        <a href="{{ url_for('datasets') }}">Datasets</a>
-      </div>
-    </nav>
-
-    <div class="container" style="padding-top: 1.5rem; padding-bottom: 3rem">
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %} {% for category, message in messages %}
-      <div class="flash {{ category }}">{{ message }}</div>
-      {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Synthia &mdash; {% block title %}Home{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <a href="{{ url_for('index') }}" class="brand">Synthia</a>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Generate</a></li>
+      <li><a href="{{ url_for('results') }}" class="{% if request.endpoint == 'results' %}active{% endif %}">Results</a></li>
+      <li><a href="{{ url_for('datasets') }}" class="{% if request.endpoint in ['datasets', 'dataset_detail'] %}active{% endif %}">Datasets</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="user-badge">{{ session.get('username', 'User') }}</span>
+      <a href="{{ url_for('logout') }}" class="btn-sm">Sign Out</a>
     </div>
-  </body>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
 </html>

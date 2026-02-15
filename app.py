@@ -9,11 +9,12 @@ import os
 import io
 import warnings
 import threading
+from functools import wraps
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings('ignore')
 
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify, session
 
 from src.utils.config_manager import ConfigManager
 from src.utils.data_loader import load_training_data, load_test_data, create_sample_data
@@ -31,6 +32,22 @@ from src.utils.audit_logger import AuditLogger
 
 app = Flask(__name__)
 app.secret_key = 'synthia-dev-key'
+
+# Demo credentials
+DEMO_USERS = {
+    'admin': 'synthia2024',
+    'researcher': 'research123',
+}
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'username' not in session:
+            flash('Please sign in to continue.', 'error')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated
 
 # Shared state
 repo = DatasetRepository()
@@ -55,7 +72,34 @@ def _get_data():
 # Routes
 # ------------------------------------------------------------------
 
+# ------------------------------------------------------------------
+# Auth Routes
+# ------------------------------------------------------------------
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'username' in session:
+        return redirect(url_for('index'))
+    if request.method == 'POST':
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        if username in DEMO_USERS and DEMO_USERS[username] == password:
+            session['username'] = username
+            flash(f'Welcome back, {username}!', 'success')
+            return redirect(url_for('index'))
+        flash('Invalid username or password.', 'error')
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    flash('You have been signed out.', 'info')
+    return redirect(url_for('login'))
+
+
 @app.route('/')
+@login_required
 def index():
     """Landing page with configuration form."""
     try:
@@ -71,6 +115,7 @@ def index():
 
 
 @app.route('/generate', methods=['POST'])
+@login_required
 def generate():
     """Run the full pipeline and redirect to results."""
     model_type = request.form.get('model_type', 'CTGAN')
@@ -179,6 +224,7 @@ def generate():
 
 
 @app.route('/results')
+@login_required
 def results():
     """Display latest generation results."""
     with _run_lock:
@@ -190,6 +236,7 @@ def results():
 
 
 @app.route('/datasets')
+@login_required
 def datasets():
     """List all saved datasets."""
     all_ds = repo.list_datasets()
@@ -197,6 +244,7 @@ def datasets():
 
 
 @app.route('/datasets/<dataset_id>/download')
+@login_required
 def download_dataset(dataset_id):
     """Download a dataset as CSV."""
     try:
@@ -217,6 +265,7 @@ def download_dataset(dataset_id):
 
 
 @app.route('/datasets/<dataset_id>')
+@login_required
 def dataset_detail(dataset_id):
     """Show dataset details and preview."""
     try:
