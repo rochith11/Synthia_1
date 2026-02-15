@@ -36,3 +36,5 @@ data/datasets/
 # Temporary
 *.tmp
 temp/
+
+tmpclaude-*
