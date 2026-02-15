@@ -1,0 +1,31 @@
+gene_symbol,chromosome,variant_type,clinical_significance,disease,allele_frequency,inheritance_pattern
+CFTR,chr7,Duplication,Likely Pathogenic,Sickle Cell Disease,0.3756846628279572,X-linked
+HEXA,chr7,Deletion,Pathogenic,Duchenne Muscular Dystrophy,0.3775168941682565,Autosomal Dominant
+HEXA,chrX,Duplication,VUS,Sickle Cell Disease,0.052458810549130375,Autosomal Recessive
+DMD,chrX,Duplication,VUS,Duchenne Muscular Dystrophy,0.45137390043310377,Autosomal Dominant
+HEXA,chrX,Insertion,Benign,Cystic Fibrosis,0.2531209338514807,X-linked
+DMD,chrX,Duplication,Pathogenic,Duchenne Muscular Dystrophy,0.41340227558776305,Autosomal Dominant
+CFTR,chr11,SNV,Benign,Cystic Fibrosis,0.16070475091427527,X-linked
+F8,chr7,Duplication,VUS,Duchenne Muscular Dystrophy,0.44786609101960406,X-linked
+F8,chr15,Duplication,Pathogenic,Sickle Cell Disease,0.1952116376883474,Autosomal Dominant
+F8,chr7,Deletion,Pathogenic,Sickle Cell Disease,0.006407988088668882,Autosomal Recessive
+HEXA,chr7,SNV,Benign,Cystic Fibrosis,0.45278560623321257,X-linked
+CFTR,chr11,Duplication,VUS,Cystic Fibrosis,0.04655205171628064,Autosomal Dominant
+HEXA,chr7,Duplication,Pathogenic,Cystic Fibrosis,0.16033750515761702,Autosomal Dominant
+HEXA,chrX,Insertion,Benign,Duchenne Muscular Dystrophy,0.47508092155835163,Autosomal Recessive
+CFTR,chrX,Duplication,VUS,Duchenne Muscular Dystrophy,0.4753529663218405,X-linked
+CFTR,chrX,Duplication,Benign,Cystic Fibrosis,0.28714550617351975,X-linked
+CFTR,chr15,Insertion,Likely Pathogenic,Sickle Cell Disease,0.31628676887272983,Autosomal Dominant
+CFTR,chr7,Deletion,Pathogenic,Duchenne Muscular Dystrophy,0.22477431546718157,Autosomal Dominant
+F8,chr7,Duplication,Likely Pathogenic,Duchenne Muscular Dystrophy,0.1473121750773342,Autosomal Recessive
+HBB,chr11,Insertion,VUS,Duchenne Muscular Dystrophy,0.16500360813958806,Autosomal Recessive
+HBB,chrX,SNV,Likely Pathogenic,Cystic Fibrosis,0.3365867095824422,X-linked
+CFTR,chr15,Deletion,Likely Pathogenic,Cystic Fibrosis,0.37643489018940235,X-linked
+HBB,chrX,SNV,VUS,Cystic Fibrosis,0.3959979428191984,Autosomal Dominant
+HBB,chrX,SNV,Benign,Cystic Fibrosis,0.3950194532544824,X-linked
+CFTR,chrX,Insertion,Likely Pathogenic,Cystic Fibrosis,0.046511845421296494,Autosomal Recessive
+HBB,chr11,Duplication,Benign,Sickle Cell Disease,0.24771573204658814,Autosomal Recessive
+HEXA,chr11,Insertion,Likely Pathogenic,Sickle Cell Disease,0.029721821248305497,Autosomal Dominant
+DMD,chr7,Insertion,Benign,Cystic Fibrosis,0.27521491227954403,Autosomal Recessive
+DMD,chr15,Insertion,VUS,Duchenne Muscular Dystrophy,0.22132372018531513,Autosomal Recessive
+CFTR,chrX,Insertion,Likely Pathogenic,Cystic Fibrosis,0.4439643871963916,Autosomal Recessive

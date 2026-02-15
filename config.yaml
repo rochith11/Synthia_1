@@ -1,0 +1,49 @@
+# Synthia Configuration
+
+# Generation Configuration
+generation:
+  defaults:
+    model_type: "CTGAN" # 'CTGAN' or 'TVAE'
+    n_samples: 1000 # Number of synthetic records to generate
+    random_seed: 42 # Random seed for reproducibility
+    epochs: 300 # Training epochs for CTGAN/TVAE
+    batch_size: 500 # Batch size for training
+
+# Disease Templates (for Phase 1: use defaults)
+diseases:
+  cystic_fibrosis:
+    name: "Cystic Fibrosis"
+    common_genes: ["CFTR"]
+    inheritance_pattern: ["Autosomal Recessive"]
+
+  duchenne_muscular_dystrophy:
+    name: "Duchenne Muscular Dystrophy"
+    common_genes: ["DMD"]
+    inheritance_pattern: ["X-linked"]
+
+  sickle_cell:
+    name: "Sickle Cell Disease"
+    common_genes: ["HBB"]
+    inheritance_pattern: ["Autosomal Recessive"]
+
+# Privacy Configuration
+privacy:
+  risk_percentile: 90 # Percentile for high-risk flagging (90 = top 10%)
+
+# Bias Detection Configuration
+bias:
+  amplification_threshold: 0.20 # 20% amplification threshold
+  rare_class_threshold: 0.05 # 5% frequency threshold for rare classes
+
+# Data Paths
+data:
+  sample_dir: "data/"
+  datasets_dir: "data/datasets/"
+  models_dir: "models/"
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  console_output: true
+  file_output: false

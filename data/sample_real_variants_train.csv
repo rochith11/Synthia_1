@@ -1,0 +1,71 @@
+gene_symbol,chromosome,variant_type,clinical_significance,disease,allele_frequency,inheritance_pattern
+F8,chrX,Insertion,VUS,Sickle Cell Disease,0.21038043115146718,X-linked
+HEXA,chr7,Insertion,Benign,Duchenne Muscular Dystrophy,0.12461776376107757,X-linked
+HBB,chrX,Insertion,Pathogenic,Sickle Cell Disease,0.17863036664697954,Autosomal Recessive
+HEXA,chrX,Deletion,Pathogenic,Sickle Cell Disease,0.3791652091217202,X-linked
+HEXA,chr7,Deletion,Benign,Duchenne Muscular Dystrophy,0.008182350826248179,Autosomal Dominant
+DMD,chr15,Duplication,Pathogenic,Duchenne Muscular Dystrophy,0.058920247612951206,Autosomal Recessive
+HBB,chr11,Duplication,Benign,Duchenne Muscular Dystrophy,0.023955318368854624,Autosomal Recessive
+HBB,chrX,SNV,Pathogenic,Cystic Fibrosis,0.0213236723571661,Autosomal Dominant
+HBB,chr11,SNV,Likely Pathogenic,Cystic Fibrosis,0.42787483142149263,Autosomal Dominant
+HEXA,chr11,Duplication,Pathogenic,Cystic Fibrosis,0.3521252718306318,Autosomal Recessive
+F8,chr7,Deletion,Benign,Sickle Cell Disease,0.23761274071457528,X-linked
+HBB,chr11,Insertion,Benign,Duchenne Muscular Dystrophy,0.049819246164849736,Autosomal Recessive
+HEXA,chr15,Duplication,Benign,Sickle Cell Disease,0.24631632168329934,Autosomal Dominant
+DMD,chr11,SNV,Benign,Cystic Fibrosis,0.2372624136195023,Autosomal Recessive
+F8,chr7,Deletion,Benign,Duchenne Muscular Dystrophy,0.08742773308509758,Autosomal Dominant
+DMD,chr15,Duplication,VUS,Sickle Cell Disease,0.21749197296974854,Autosomal Recessive
+F8,chrX,Duplication,VUS,Duchenne Muscular Dystrophy,0.19985386246428935,X-linked
+HEXA,chr11,Deletion,Pathogenic,Sickle Cell Disease,0.308309198928056,Autosomal Recessive
+CFTR,chr7,Duplication,Benign,Duchenne Muscular Dystrophy,0.31791173178295423,Autosomal Recessive
+F8,chrX,Deletion,Pathogenic,Cystic Fibrosis,0.023606700876250216,Autosomal Dominant
+DMD,chrX,Insertion,Benign,Cystic Fibrosis,0.18793169469860913,Autosomal Dominant
+HEXA,chrX,Deletion,Benign,Duchenne Muscular Dystrophy,0.31330409794140396,Autosomal Dominant
+F8,chr15,Deletion,VUS,Sickle Cell Disease,0.2520649930314638,Autosomal Recessive
+CFTR,chr11,Deletion,VUS,Cystic Fibrosis,0.42838843075297284,X-linked
+CFTR,chr7,Duplication,Likely Pathogenic,Cystic Fibrosis,0.32968812217785354,Autosomal Dominant
+HBB,chrX,Duplication,VUS,Cystic Fibrosis,0.08230427911363342,Autosomal Dominant
+HBB,chr15,Deletion,Likely Pathogenic,Duchenne Muscular Dystrophy,0.03621380495281449,Autosomal Recessive
+DMD,chrX,Duplication,Likely Pathogenic,Duchenne Muscular Dystrophy,0.3215672198249515,Autosomal Dominant
+F8,chr15,SNV,Likely Pathogenic,Sickle Cell Disease,0.014229143960269284,X-linked
+F8,chr15,SNV,Likely Pathogenic,Sickle Cell Disease,0.29330201505545817,X-linked
+HBB,chr11,Duplication,Likely Pathogenic,Sickle Cell Disease,0.4701748904710538,Autosomal Dominant
+F8,chr15,Duplication,Pathogenic,Duchenne Muscular Dystrophy,0.2881616147600636,Autosomal Dominant
+F8,chrX,Deletion,VUS,Duchenne Muscular Dystrophy,0.19469679317705443,Autosomal Recessive
+CFTR,chr15,Insertion,Likely Pathogenic,Sickle Cell Disease,0.32200082100273425,X-linked
+HBB,chr11,Duplication,Benign,Sickle Cell Disease,0.2296681923552668,X-linked
+HEXA,chr11,SNV,VUS,Duchenne Muscular Dystrophy,0.27326277786865155,Autosomal Dominant
+HBB,chrX,Deletion,VUS,Sickle Cell Disease,0.47079093957948603,Autosomal Recessive
+HEXA,chrX,Duplication,Likely Pathogenic,Cystic Fibrosis,0.19366521626258634,X-linked
+CFTR,chrX,SNV,Pathogenic,Duchenne Muscular Dystrophy,0.4806340913481332,X-linked
+DMD,chr15,SNV,Likely Pathogenic,Sickle Cell Disease,0.4527699703360758,Autosomal Recessive
+F8,chr7,Insertion,Pathogenic,Duchenne Muscular Dystrophy,0.09869977625985893,Autosomal Recessive
+CFTR,chr15,Deletion,Benign,Cystic Fibrosis,0.03561128913670756,X-linked
+F8,chrX,Deletion,VUS,Duchenne Muscular Dystrophy,0.0512882226873359,X-linked
+DMD,chrX,Insertion,Benign,Duchenne Muscular Dystrophy,0.010092691000123315,Autosomal Recessive
+DMD,chrX,Insertion,Pathogenic,Duchenne Muscular Dystrophy,0.04812703741720827,X-linked
+CFTR,chrX,Deletion,Pathogenic,Duchenne Muscular Dystrophy,0.34182037993476205,Autosomal Dominant
+DMD,chrX,Deletion,Benign,Cystic Fibrosis,0.036523135581654265,Autosomal Dominant
+HEXA,chr11,Duplication,Pathogenic,Duchenne Muscular Dystrophy,0.1601688395165869,Autosomal Recessive
+DMD,chrX,Duplication,Benign,Duchenne Muscular Dystrophy,0.42259278017375784,Autosomal Recessive
+F8,chrX,Insertion,VUS,Sickle Cell Disease,0.012612695932177106,Autosomal Recessive
+F8,chr7,Duplication,Benign,Duchenne Muscular Dystrophy,0.40741977281187897,Autosomal Dominant
+F8,chr7,SNV,VUS,Sickle Cell Disease,0.14164553261192656,X-linked
+F8,chr7,Duplication,Benign,Cystic Fibrosis,0.05996424898320647,Autosomal Dominant
+HEXA,chr7,Duplication,Pathogenic,Cystic Fibrosis,0.34867184551671115,X-linked
+HBB,chr11,SNV,Benign,Cystic Fibrosis,0.3148424805431621,Autosomal Dominant
+CFTR,chr7,Insertion,Pathogenic,Cystic Fibrosis,0.4388585347499994,X-linked
+F8,chrX,SNV,Benign,Sickle Cell Disease,0.367800450858139,Autosomal Dominant
+DMD,chr15,Duplication,Benign,Duchenne Muscular Dystrophy,0.40193698426203944,Autosomal Recessive
+F8,chr7,Insertion,Likely Pathogenic,Cystic Fibrosis,0.14173525171308193,Autosomal Dominant
+DMD,chr11,Duplication,Pathogenic,Duchenne Muscular Dystrophy,0.0895423323460817,X-linked
+DMD,chr11,SNV,Likely Pathogenic,Sickle Cell Disease,0.3755567610687883,Autosomal Dominant
+F8,chr7,SNV,Pathogenic,Sickle Cell Disease,0.40361053489436477,Autosomal Dominant
+HEXA,chr15,Duplication,Likely Pathogenic,Sickle Cell Disease,0.495262065858336,Autosomal Dominant
+DMD,chr7,Deletion,VUS,Cystic Fibrosis,0.20689622077880182,Autosomal Recessive
+DMD,chr11,Deletion,Benign,Duchenne Muscular Dystrophy,0.1866370248105988,Autosomal Dominant
+F8,chrX,SNV,Pathogenic,Duchenne Muscular Dystrophy,0.38843006741025643,Autosomal Recessive
+DMD,chrX,SNV,Pathogenic,Duchenne Muscular Dystrophy,0.1710609665862559,Autosomal Recessive
+DMD,chr11,Deletion,Benign,Sickle Cell Disease,0.4654479054761788,Autosomal Dominant
+F8,chr7,Deletion,Pathogenic,Cystic Fibrosis,0.4293479631696629,Autosomal Dominant
+F8,chrX,Duplication,Pathogenic,Sickle Cell Disease,0.21506801966013417,Autosomal Dominant
