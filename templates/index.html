@@ -1,46 +1,172 @@
-{% extends "base.html" %}
-{% block title %}Synthia - Generate{% endblock %}
-{% block content %}
-<div class="card">
-    <h2>Generate Synthetic Data</h2>
-    <form method="POST" action="{{ url_for('generate') }}">
-        <div class="form-grid">
-            <div>
-                <label for="model_type">Model Type</label>
-                <select id="model_type" name="model_type">
-                    <option value="CTGAN" {% if defaults.get('model_type')=='CTGAN' %}selected{% endif %}>CTGAN</option>
-                    <option value="TVAE" {% if defaults.get('model_type')=='TVAE' %}selected{% endif %}>TVAE</option>
-                </select>
-            </div>
-            <div>
-                <label for="n_samples">Number of Samples</label>
-                <input type="number" id="n_samples" name="n_samples" value="{{ defaults.get('n_samples', 1000) }}" min="1" max="100000">
-            </div>
-            <div>
-                <label for="random_seed">Random Seed</label>
-                <input type="number" id="random_seed" name="random_seed" value="{{ defaults.get('random_seed', 42) }}">
-            </div>
-            <div>
-                <label for="epochs">Training Epochs</label>
-                <input type="number" id="epochs" name="epochs" value="{{ defaults.get('epochs', 300) }}" min="1">
-            </div>
-            <div>
-                <label for="batch_size">Batch Size</label>
-                <input type="number" id="batch_size" name="batch_size" value="{{ defaults.get('batch_size', 500) }}" min="1">
-            </div>
-            <div>
-                <label for="disease">Disease Filter (optional)</label>
-                <select id="disease" name="disease">
-                    <option value="">All Diseases</option>
-                    <option value="Cystic Fibrosis">Cystic Fibrosis</option>
-                    <option value="Duchenne Muscular Dystrophy">Duchenne Muscular Dystrophy</option>
-                    <option value="Sickle Cell Disease">Sickle Cell Disease</option>
-                    <option value="Hemophilia A">Hemophilia A</option>
-                    <option value="Tay-Sachs Disease">Tay-Sachs Disease</option>
-                </select>
-            </div>
+{% extends "base.html" %} {% block title %}Synthia | Generate{% endblock %} {%
+block content %}
+<section class="hero" data-animate="rise">
+  <p class="eyebrow">Synthetic Health Data Studio</p>
+  <h1 class="page-title">
+    Generate realistic, privacy-aware records with a cleaner workflow.
+  </h1>
+  <p class="lead">
+    Tune model settings, run generation, and inspect quality, privacy, and bias
+    outputs in one streamlined interface.
+  </p>
+  <div class="hero-pills">
+    <span class="pill">CTGAN + TVAE</span>
+    <span class="pill">Validation Built In</span>
+    <span class="pill">Bias + Privacy Checks</span>
+  </div>
+</section>
+
+<section class="layout-split">
+  <article class="card elevated" data-animate="rise">
+    <div class="section-head">
+      <h2>Generation Configuration</h2>
+      <p>These controls map directly to existing engine parameters.</p>
+    </div>
+
+    <form
+      method="POST"
+      action="{{ url_for('generate') }}"
+      class="stack-md js-loading-form"
+    >
+      <div class="form-grid">
+        <div class="field">
+          <label for="model_type">Model Type</label>
+          <select id="model_type" name="model_type">
+            <option
+              value="CTGAN"
+              {% if defaults.get('model_type')=='CTGAN' %}selected{% endif %}
+            >
+              CTGAN
+            </option>
+            <option
+              value="TVAE"
+              {% if defaults.get('model_type')=='TVAE' %}selected{% endif %}
+            >
+              TVAE
+            </option>
+          </select>
+          <p class="field-help">Select the synthesis model architecture.</p>
         </div>
-        <button type="submit" class="btn mt-1">Generate Synthetic Data</button>
+
+        <div class="field">
+          <label for="n_samples">Number of Samples</label>
+          <input
+            type="number"
+            id="n_samples"
+            name="n_samples"
+            value="{{ defaults.get('n_samples', 1000) }}"
+            min="1"
+            max="100000"
+          />
+          <p class="field-help">Target number of synthetic records to create.</p>
+        </div>
+
+        <div class="field">
+          <label for="random_seed">Random Seed</label>
+          <input
+            type="number"
+            id="random_seed"
+            name="random_seed"
+            value="{{ defaults.get('random_seed', 42) }}"
+          />
+          <p class="field-help">Keeps runs reproducible across generations.</p>
+        </div>
+
+        <div class="field">
+          <label for="epochs">Training Epochs</label>
+          <input
+            type="number"
+            id="epochs"
+            name="epochs"
+            value="{{ defaults.get('epochs', 300) }}"
+            min="1"
+          />
+          <p class="field-help">Higher values can improve fit but take longer.</p>
+        </div>
+
+        <div class="field">
+          <label for="batch_size">Batch Size</label>
+          <input
+            type="number"
+            id="batch_size"
+            name="batch_size"
+            value="{{ defaults.get('batch_size', 500) }}"
+            min="1"
+          />
+          <p class="field-help">
+            Controls records processed per training iteration.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="disease">Disease Filter (optional)</label>
+          <select id="disease" name="disease">
+            <option value="">All Diseases</option>
+            <option value="Cystic Fibrosis">Cystic Fibrosis</option>
+            <option value="Duchenne Muscular Dystrophy">
+              Duchenne Muscular Dystrophy
+            </option>
+            <option value="Sickle Cell Disease">Sickle Cell Disease</option>
+            <option value="Hemophilia A">Hemophilia A</option>
+            <option value="Tay-Sachs Disease">Tay-Sachs Disease</option>
+          </select>
+          <p class="field-help">
+            Restrict training and generation to a specific cohort.
+          </p>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg"
+          data-loading-text="Generating..."
+        >
+          Generate Synthetic Data
+        </button>
+        <a href="{{ url_for('datasets') }}" class="btn btn-ghost"
+          >Browse Datasets</a
+        >
+      </div>
     </form>
-</div>
+  </article>
+
+  <aside class="stack-md" data-animate="slide">
+    <article class="card accent-card">
+      <h3>How this run flows</h3>
+      <ol class="clean-list">
+        <li>Train selected model on the source training data.</li>
+        <li>Generate synthetic samples at the configured volume.</li>
+        <li>Run validation, privacy, and bias analysis checks.</li>
+        <li>Save data plus metadata for reproducibility and export.</li>
+      </ol>
+    </article>
+
+    <article class="card">
+      <h3>Current defaults</h3>
+      <dl class="meta-list">
+        <div>
+          <dt>Model</dt>
+          <dd>{{ defaults.get('model_type', 'CTGAN') }}</dd>
+        </div>
+        <div>
+          <dt>Samples</dt>
+          <dd>{{ defaults.get('n_samples', 1000) }}</dd>
+        </div>
+        <div>
+          <dt>Random Seed</dt>
+          <dd>{{ defaults.get('random_seed', 42) }}</dd>
+        </div>
+        <div>
+          <dt>Epochs</dt>
+          <dd>{{ defaults.get('epochs', 300) }}</dd>
+        </div>
+        <div>
+          <dt>Batch Size</dt>
+          <dd>{{ defaults.get('batch_size', 500) }}</dd>
+        </div>
+      </dl>
+    </article>
+  </aside>
+</section>
 {% endblock %}

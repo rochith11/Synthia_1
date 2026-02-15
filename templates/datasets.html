@@ -1,10 +1,55 @@
-{% extends "base.html" %} {% block title %}Synthia - Datasets{% endblock %} {%
-block content %}
+{% extends "base.html" %} {% block title %}Synthia | Datasets{% endblock %} {%
+block content %} {% set ns = namespace(q_sum=0, q_count=0, p_sum=0, p_count=0)
+%} {% for ds in datasets %} {% if ds.get('quality_score') is not none %} {% set
+ns.q_sum = ns.q_sum + ds.get('quality_score') %} {% set ns.q_count = ns.q_count
++ 1 %} {% endif %} {% if ds.get('privacy_score') is not none %} {% set ns.p_sum
+= ns.p_sum + ds.get('privacy_score') %} {% set ns.p_count = ns.p_count + 1 %}
+{% endif %} {% endfor %}
 
-<h2 class="section-title">Saved Datasets</h2>
+<section class="hero compact" data-animate="rise">
+  <p class="eyebrow">Repository</p>
+  <h1 class="page-title">Saved Datasets</h1>
+  <p class="lead">
+    Browse generated artifacts, inspect lineage, and export files for downstream
+    analysis.
+  </p>
+</section>
+
+<section class="kpi-grid small" data-animate="rise">
+  <article class="kpi-card">
+    <p class="kpi-label">Datasets</p>
+    <p class="kpi-value metric-value" data-countup="{{ datasets|length }}">
+      {{ datasets|length }}
+    </p>
+  </article>
+  <article class="kpi-card">
+    <p class="kpi-label">Average Quality</p>
+    <p
+      class="kpi-value metric-value"
+      {% if ns.q_count %}
+      data-countup="{{ '%.3f'|format(ns.q_sum / ns.q_count) }}"
+      {% endif %}
+    >
+      {% if ns.q_count %}{{ "%.3f"|format(ns.q_sum / ns.q_count) }}{% else
+      %}-{% endif %}
+    </p>
+  </article>
+  <article class="kpi-card">
+    <p class="kpi-label">Average Privacy</p>
+    <p
+      class="kpi-value metric-value"
+      {% if ns.p_count %}
+      data-countup="{{ '%.3f'|format(ns.p_sum / ns.p_count) }}"
+      {% endif %}
+    >
+      {% if ns.p_count %}{{ "%.3f"|format(ns.p_sum / ns.p_count) }}{% else
+      %}-{% endif %}
+    </p>
+  </article>
+</section>
 
 {% if datasets %}
-<div class="card">
+<article class="card" data-animate="slide">
   <div class="table-wrap">
     <table>
       <tr>
@@ -22,33 +67,42 @@ block content %}
         <td>{{ ds.get('created_at', '-')[:19] }}</td>
         <td>
           {% if ds.get('quality_score') is not none %} {{
-          "%.3f"|format(ds.quality_score) }} {% else %}-{% endif %}
+          "%.3f"|format(ds.quality_score) }} {% else %}
+          <span class="text-muted">-</span>
+          {% endif %}
         </td>
         <td>
           {% if ds.get('privacy_score') is not none %} {{
-          "%.3f"|format(ds.privacy_score) }} {% else %}-{% endif %}
+          "%.3f"|format(ds.privacy_score) }} {% else %}
+          <span class="text-muted">-</span>
+          {% endif %}
         </td>
         <td>
-          <a
-            href="{{ url_for('dataset_detail', dataset_id=ds.dataset_id) }}"
-            class="btn btn-sm btn-outline"
-            >View</a
-          >
-          <a
-            href="{{ url_for('download_dataset', dataset_id=ds.dataset_id) }}"
-            class="btn btn-sm"
-            >Download</a
-          >
+          <div class="dataset-actions">
+            <a
+              href="{{ url_for('dataset_detail', dataset_id=ds.dataset_id) }}"
+              class="btn btn-sm btn-secondary"
+              >View</a
+            >
+            <a
+              href="{{ url_for('download_dataset', dataset_id=ds.dataset_id) }}"
+              class="btn btn-sm btn-primary"
+              >Download</a
+            >
+          </div>
         </td>
       </tr>
       {% endfor %}
     </table>
   </div>
-</div>
+</article>
 {% else %}
-<div class="card">
-  <p class="text-muted">
-    No datasets saved yet. <a href="{{ url_for('index') }}">Generate one</a>.
+<article class="card empty-state" data-animate="rise">
+  <h3>No datasets saved yet</h3>
+  <p>
+    Run your first generation to populate this repository and enable dataset
+    exports.
   </p>
-</div>
+  <a href="{{ url_for('index') }}" class="btn btn-primary">Generate Dataset</a>
+</article>
 {% endif %} {% endblock %}

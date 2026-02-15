@@ -1,0 +1,11 @@
+.results-actions {
+  margin-top: var(--space-3);
+}
+
+.preview-card td {
+  white-space: nowrap;
+}
+
+.kpi-grid.small {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
