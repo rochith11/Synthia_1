@@ -1,0 +1,2 @@
+{"timestamp": "2026-02-15T13:07:26.635321+00:00", "action": "generate", "resource_id": null, "username": "default_user", "details": {"model": "CTGAN", "n_samples": 50}}
+{"timestamp": "2026-02-15T13:07:27.266342+00:00", "action": "save", "resource_id": "98647b12-951d-4a0f-822a-057feb14b00a", "username": "default_user", "details": {"dataset_name": "CTGAN-50"}}

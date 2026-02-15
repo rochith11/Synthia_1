@@ -80,10 +80,17 @@ def main():
         print()
 
         # Correlation similarity
-        corr_sim = report.statistical_metrics.get('correlation_similarity', 0)
-        print(f"Correlation Similarity: {corr_sim:.4f}")
+        corr_sim = report.statistical_metrics.get('correlation_similarity')
+        if corr_sim is not None:
+            print(f"Correlation Similarity: {corr_sim:.4f}")
+        else:
+            print("Correlation Similarity: N/A (< 2 numerical columns)")
 
         print()
+
+        print("Train size:", len(train_data))
+        print("Test size:", len(test_data))
+
 
         # ML Utility
         print("ML Utility (Bidirectional Cross-Testing):")
@@ -120,7 +127,7 @@ def main():
 Results:
   Mean KS Statistic:       {summary.get('mean_ks_statistic', 0):.4f}
   Mean JS Divergence:      {summary.get('mean_jsd', 0):.4f}
-  Correlation Similarity:  {summary.get('correlation_similarity', 0):.4f}
+  Correlation Similarity:  {summary.get('correlation_similarity', 'N/A')}
   Syn->Real Accuracy:      {s2r.get('accuracy', 0):.4f}
   Syn->Real F1:            {s2r.get('f1_score', 0):.4f}
   Syn->Real AUC:           {s2r.get('auc', 0):.4f}
@@ -132,6 +139,80 @@ Results:
 
 Ready for: CHECKPOINT 2 REVIEW
 """)
+        print_section("ADDITIONAL STRESS TESTS")
+
+        # ==========================================================
+        # TEST A: Random Noise Sensitivity
+        # ==========================================================
+        print("\n[TEST A] Random Noise Sensitivity")
+
+        noisy = test_data.copy()
+        import numpy as np
+        noisy['allele_frequency'] = np.random.rand(len(noisy))
+        noisy['gene_symbol'] = np.random.choice(
+            test_data['gene_symbol'].unique(),
+            size=len(noisy)
+        )
+
+        noise_report = validator.validate(
+            synthetic=noisy,
+            real=test_data,
+            target_column='disease',
+            dataset_id='noise-test'
+        )
+
+        print(f"  Noise Mean JSD: {noise_report.statistical_metrics['summary']['mean_jsd']:.4f}")
+        print(f"  Noise Quality Score: {noise_report.overall_quality_score:.4f}")
+
+        # ==========================================================
+        # TEST B: Forced Mode Collapse
+        # ==========================================================
+        print("\n[TEST B] Forced Mode Collapse")
+
+        collapsed = test_data.copy()
+        collapsed['gene_symbol'] = collapsed['gene_symbol'].iloc[0]
+
+        collapse_report = validator.validate(
+            synthetic=collapsed,
+            real=test_data,
+            target_column='disease',
+            dataset_id='collapse-test'
+        )
+
+        print(f"  Collapse Mean JSD: {collapse_report.statistical_metrics['summary']['mean_jsd']:.4f}")
+        print(f"  Collapse Quality Score: {collapse_report.overall_quality_score:.4f}")
+
+        # ==========================================================
+        # TEST C: NaN Propagation Guard
+        # ==========================================================
+        print("\n[TEST C] NaN Propagation")
+
+        nan_test = synthetic_data.copy()
+        nan_test.loc[0, 'allele_frequency'] = np.nan
+
+        try:
+            validator.validate(
+                synthetic=nan_test,
+                real=test_data,
+                target_column='disease',
+                dataset_id='nan-test'
+            )
+            print("  WARNING: NaN not detected!")
+        except Exception as e:
+            print("  NaN correctly triggered error.")
+
+        # ==========================================================
+        # TEST D: Bound Checks
+        # ==========================================================
+        print("\n[TEST D] Score Bounds")
+
+        assert 0 <= report.overall_quality_score <= 1, "Quality score out of bounds"
+        assert 0 <= report.statistical_metrics['summary']['mean_jsd'] <= 1, "JSD out of bounds"
+
+        print("  Bound checks passed.")
+
+        print("\nAll stress tests executed.")
+
 
         return True
 

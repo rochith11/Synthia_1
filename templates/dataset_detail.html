@@ -1,0 +1,91 @@
+{% extends "base.html" %} {% block title %}Synthia - Dataset {{ dataset_id[:8]
+}}{% endblock %} {% block content %}
+
+<h2 class="section-title">
+  Dataset: {{ meta.get('dataset_name', 'unnamed') }}
+</h2>
+
+<div class="card">
+  <h3 class="text-sm mb-1">Metadata</h3>
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Value</th>
+      </tr>
+      <tr>
+        <td>Dataset ID</td>
+        <td>{{ dataset_id }}</td>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td>{{ meta.get('dataset_name', '-') }}</td>
+      </tr>
+      <tr>
+        <td>Records</td>
+        <td>{{ meta.get('n_records', '-') }}</td>
+      </tr>
+      <tr>
+        <td>Created</td>
+        <td>{{ meta.get('created_at', '-') }}</td>
+      </tr>
+      <tr>
+        <td>Model</td>
+        <td>{{ meta.get('model_type', '-') }}</td>
+      </tr>
+      <tr>
+        <td>Random Seed</td>
+        <td>{{ meta.get('random_seed', '-') }}</td>
+      </tr>
+      <tr>
+        <td>Training Data Hash</td>
+        <td>{{ meta.get('training_data_hash', '-') }}</td>
+      </tr>
+      {% if meta.get('quality_score') is not none %}
+      <tr>
+        <td>Quality Score</td>
+        <td>{{ "%.4f"|format(meta.quality_score) }}</td>
+      </tr>
+      {% endif %} {% if meta.get('privacy_score') is not none %}
+      <tr>
+        <td>Privacy Score</td>
+        <td>{{ "%.4f"|format(meta.privacy_score) }}</td>
+      </tr>
+      {% endif %}
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h3 class="text-sm mb-1">Data Preview (first 20 rows)</h3>
+  <div class="table-wrap">
+    <table>
+      <tr>
+        {% for col in columns %}
+        <th>{{ col }}</th>
+        {% endfor %}
+      </tr>
+      {% for row in preview %}
+      <tr>
+        {% for col in columns %}
+        <td>{{ row[col] }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+<div class="mt-2">
+  <a href="{{ url_for('download_dataset', dataset_id=dataset_id) }}" class="btn"
+    >Download CSV</a
+  >
+  <a
+    href="{{ url_for('datasets') }}"
+    class="btn btn-outline"
+    style="margin-left: 0.5rem"
+    >Back to Datasets</a
+  >
+</div>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Synthia{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <nav>
+      <div class="container">
+        <a href="{{ url_for('index') }}" class="brand">Synthia</a>
+        <a href="{{ url_for('index') }}">Generate</a>
+        <a href="{{ url_for('results') }}">Results</a>
+        <a href="{{ url_for('datasets') }}">Datasets</a>
+      </div>
+    </nav>
+
+    <div class="container" style="padding-top: 1.5rem; padding-bottom: 3rem">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import ks_2samp
 from scipy.spatial.distance import jensenshannon
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, Optional
 
 
 class StatisticalAnalyzer:
@@ -20,12 +20,11 @@ class StatisticalAnalyzer:
         Returns:
             Tuple of (ks_statistic, p_value)
         """
-        # Drop NaN values
         syn_clean = synthetic.dropna().values.astype(float)
         real_clean = real.dropna().values.astype(float)
 
         if len(syn_clean) == 0 or len(real_clean) == 0:
-            return (1.0, 0.0)  # Maximum divergence if empty
+            return (1.0, 0.0)
 
         statistic, p_value = ks_2samp(real_clean, syn_clean)
         return (float(statistic), float(p_value))
@@ -51,7 +50,6 @@ class StatisticalAnalyzer:
         if len(syn_clean) == 0 or len(real_clean) == 0:
             return 1.0
 
-        # Check if data is categorical (object/string type)
         if real_clean.dtype == 'object' or str(real_clean.dtype) == 'category':
             return self._js_divergence_categorical(syn_clean, real_clean)
         else:
@@ -59,40 +57,46 @@ class StatisticalAnalyzer:
 
     def _js_divergence_categorical(self, synthetic: pd.Series, real: pd.Series) -> float:
         """JSD for categorical data using value counts as probability distributions."""
-        # Get union of all categories
-        all_categories = set(real.unique()) | set(synthetic.unique())
+        all_categories = sorted(set(real.unique()) | set(synthetic.unique()))
 
-        # Build probability distributions with Laplace smoothing
         real_counts = real.value_counts()
         syn_counts = synthetic.value_counts()
 
-        # Small smoothing constant to avoid zero probabilities
-        smoothing = 1e-10
+        n_real = len(real)
+        n_syn = len(synthetic)
 
-        real_probs = np.array([real_counts.get(cat, 0) + smoothing for cat in all_categories])
-        syn_probs = np.array([syn_counts.get(cat, 0) + smoothing for cat in all_categories])
+        # Use count-based probabilities with minimal smoothing to avoid
+        # masking true divergence. Smoothing of 1/N keeps zero-count categories
+        # from being treated as present while still allowing JSD computation.
+        smoothing = 1.0 / (max(n_real, n_syn) * 10)
 
-        # Normalize to valid probability distributions
+        real_probs = np.array([real_counts.get(cat, 0) / n_real + smoothing
+                               for cat in all_categories])
+        syn_probs = np.array([syn_counts.get(cat, 0) / n_syn + smoothing
+                              for cat in all_categories])
+
         real_probs = real_probs / real_probs.sum()
         syn_probs = syn_probs / syn_probs.sum()
 
+        # jensenshannon returns the distance (sqrt of divergence), square it for JSD
         return float(jensenshannon(real_probs, syn_probs) ** 2)
 
     def _js_divergence_numerical(self, synthetic: pd.Series, real: pd.Series,
                                  bins: int) -> float:
         """JSD for numerical data by binning into histograms."""
-        # Determine common bin edges from the union of both distributions
         combined = np.concatenate([real.values, synthetic.values])
         bin_edges = np.linspace(combined.min(), combined.max(), bins + 1)
 
-        # Build histograms
         real_hist, _ = np.histogram(real.values, bins=bin_edges)
         syn_hist, _ = np.histogram(synthetic.values, bins=bin_edges)
 
-        # Convert to probabilities with smoothing
-        smoothing = 1e-10
-        real_probs = (real_hist + smoothing).astype(float)
-        syn_probs = (syn_hist + smoothing).astype(float)
+        n_real = real_hist.sum()
+        n_syn = syn_hist.sum()
+
+        smoothing = 1.0 / (max(n_real, n_syn) * 10)
+
+        real_probs = (real_hist / n_real + smoothing).astype(float)
+        syn_probs = (syn_hist / n_syn + smoothing).astype(float)
 
         real_probs = real_probs / real_probs.sum()
         syn_probs = syn_probs / syn_probs.sum()
@@ -100,20 +104,19 @@ class StatisticalAnalyzer:
         return float(jensenshannon(real_probs, syn_probs) ** 2)
 
     def compute_correlation_similarity(self, synthetic: pd.DataFrame,
-                                       real: pd.DataFrame) -> float:
+                                       real: pd.DataFrame) -> Optional[float]:
         """Compute correlation matrix similarity between datasets.
 
-        Uses only numerical columns. Computes Frobenius norm of the difference
-        between correlation matrices, normalized to [0, 1].
+        Uses only numerical columns. Returns None when fewer than 2 numerical
+        columns exist (cannot compute meaningful correlation).
 
         Args:
             synthetic: Synthetic DataFrame
             real: Real DataFrame
 
         Returns:
-            Similarity score in [0, 1] (1 = identical correlation structure)
+            Similarity score in [0, 1] or None if not computable
         """
-        # Select only numerical columns present in both
         num_cols = []
         for col in real.columns:
             if real[col].dtype in ['float64', 'float32', 'int64', 'int32']:
@@ -121,19 +124,16 @@ class StatisticalAnalyzer:
                     num_cols.append(col)
 
         if len(num_cols) < 2:
-            # Need at least 2 numerical columns for correlation
-            return 1.0
+            return None
 
         real_corr = real[num_cols].corr().values
         syn_corr = synthetic[num_cols].corr().values
 
-        # Replace NaN with 0 in correlation matrices
         real_corr = np.nan_to_num(real_corr, nan=0.0)
         syn_corr = np.nan_to_num(syn_corr, nan=0.0)
 
-        # Frobenius norm of difference, normalized
         diff_norm = np.linalg.norm(real_corr - syn_corr, 'fro')
-        max_norm = np.sqrt(2 * len(num_cols) ** 2)  # Max possible Frobenius norm
+        max_norm = np.sqrt(2 * len(num_cols) ** 2)
 
         if max_norm == 0:
             return 1.0
@@ -155,36 +155,33 @@ class StatisticalAnalyzer:
         results = {
             'ks_tests': {},
             'js_divergences': {},
-            'correlation_similarity': 0.0,
+            'correlation_similarity': None,
             'summary': {}
         }
 
         common_cols = [c for c in real.columns if c in synthetic.columns]
 
-        # Per-column metrics
         ks_stats = []
         jsd_values = []
 
         for col in common_cols:
-            # JSD works for all column types
             jsd = self.compute_js_divergence(synthetic[col], real[col])
             results['js_divergences'][col] = jsd
             jsd_values.append(jsd)
 
-            # KS test only for numerical columns
             if real[col].dtype in ['float64', 'float32', 'int64', 'int32']:
                 ks_stat, p_val = self.compute_ks_statistic(synthetic[col], real[col])
                 results['ks_tests'][col] = {'statistic': ks_stat, 'p_value': p_val}
                 ks_stats.append(ks_stat)
 
-        # Correlation similarity
-        results['correlation_similarity'] = self.compute_correlation_similarity(synthetic, real)
+        corr_sim = self.compute_correlation_similarity(synthetic, real)
+        results['correlation_similarity'] = corr_sim
 
-        # Summary statistics
         results['summary'] = {
             'mean_ks_statistic': float(np.mean(ks_stats)) if ks_stats else 0.0,
             'mean_jsd': float(np.mean(jsd_values)) if jsd_values else 0.0,
-            'correlation_similarity': results['correlation_similarity']
+            'max_jsd': float(np.max(jsd_values)) if jsd_values else 0.0,
+            'correlation_similarity': corr_sim
         }
 
         return results

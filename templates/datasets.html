@@ -1,0 +1,54 @@
+{% extends "base.html" %} {% block title %}Synthia - Datasets{% endblock %} {%
+block content %}
+
+<h2 class="section-title">Saved Datasets</h2>
+
+{% if datasets %}
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Name</th>
+        <th>Records</th>
+        <th>Created</th>
+        <th>Quality</th>
+        <th>Privacy</th>
+        <th>Actions</th>
+      </tr>
+      {% for ds in datasets %}
+      <tr>
+        <td>{{ ds.get('dataset_name', 'unnamed') }}</td>
+        <td>{{ ds.get('n_records', '-') }}</td>
+        <td>{{ ds.get('created_at', '-')[:19] }}</td>
+        <td>
+          {% if ds.get('quality_score') is not none %} {{
+          "%.3f"|format(ds.quality_score) }} {% else %}-{% endif %}
+        </td>
+        <td>
+          {% if ds.get('privacy_score') is not none %} {{
+          "%.3f"|format(ds.privacy_score) }} {% else %}-{% endif %}
+        </td>
+        <td>
+          <a
+            href="{{ url_for('dataset_detail', dataset_id=ds.dataset_id) }}"
+            class="btn btn-sm btn-outline"
+            >View</a
+          >
+          <a
+            href="{{ url_for('download_dataset', dataset_id=ds.dataset_id) }}"
+            class="btn btn-sm"
+            >Download</a
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card">
+  <p class="text-muted">
+    No datasets saved yet. <a href="{{ url_for('index') }}">Generate one</a>.
+  </p>
+</div>
+{% endif %} {% endblock %}
