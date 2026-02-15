@@ -28,7 +28,7 @@ htmlcov/
 .tox/
 
 # Project specific
-models/
+/models/
 data/datasets/
 *.log
 .DS_Store
