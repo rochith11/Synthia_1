@@ -4,26 +4,75 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Synthia{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
+    {% block head_extra %}{% endblock %}
   </head>
-  <body>
-    <nav>
-      <div class="container">
-        <a href="{{ url_for('index') }}" class="brand">Synthia</a>
-        <a href="{{ url_for('index') }}">Generate</a>
-        <a href="{{ url_for('results') }}">Results</a>
-        <a href="{{ url_for('datasets') }}">Datasets</a>
-      </div>
-    </nav>
-
-    <div class="container" style="padding-top: 1.5rem; padding-bottom: 3rem">
-      {% with messages = get_flashed_messages(with_categories=true) %} {% if
-      messages %} {% for category, message in messages %}
-      <div class="flash {{ category }}">{{ message }}</div>
-      {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+  <body class="{% block body_class %}{% endblock %}">
+    <div class="backdrop" aria-hidden="true">
+      <span class="orb orb-one"></span>
+      <span class="orb orb-two"></span>
+      <span class="orb orb-three"></span>
     </div>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a href="{{ url_for('index') }}" class="brand-mark">
+          <span class="brand-badge">S</span>
+          <span class="brand-text">Synthia Studio</span>
+        </a>
+
+        <button
+          type="button"
+          class="menu-toggle"
+          aria-expanded="false"
+          aria-controls="site-nav"
+        >
+          Menu
+        </button>
+
+        <nav id="site-nav" class="site-nav" data-open="false">
+          <a
+            href="{{ url_for('index') }}"
+            class="{% if request.endpoint == 'index' %}is-active{% endif %}"
+            >Generate</a
+          >
+          <a
+            href="{{ url_for('results') }}"
+            class="{% if request.endpoint == 'results' %}is-active{% endif %}"
+            >Results</a
+          >
+          <a
+            href="{{ url_for('datasets') }}"
+            class="{% if request.endpoint == 'datasets' or request.endpoint == 'dataset_detail' %}is-active{% endif %}"
+            >Datasets</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main class="content-wrap">
+      <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="flash-stack" data-animate="rise">
+          {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %} {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
   </body>
 </html>

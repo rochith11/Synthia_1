@@ -1,91 +1,133 @@
-{% extends "base.html" %} {% block title %}Synthia - Dataset {{ dataset_id[:8]
+{% extends "base.html" %} {% block title %}Synthia | Dataset {{ dataset_id[:8]
 }}{% endblock %} {% block content %}
+<section class="hero compact" data-animate="rise">
+  <p class="eyebrow">Dataset Detail</p>
+  <h1 class="page-title">{{ meta.get('dataset_name', 'unnamed') }}</h1>
+  <p class="lead"><code>{{ dataset_id }}</code></p>
+</section>
 
-<h2 class="section-title">
-  Dataset: {{ meta.get('dataset_name', 'unnamed') }}
-</h2>
-
-<div class="card">
-  <h3 class="text-sm mb-1">Metadata</h3>
-  <div class="table-wrap">
-    <table>
-      <tr>
-        <th>Field</th>
-        <th>Value</th>
-      </tr>
-      <tr>
-        <td>Dataset ID</td>
-        <td>{{ dataset_id }}</td>
-      </tr>
-      <tr>
-        <td>Name</td>
-        <td>{{ meta.get('dataset_name', '-') }}</td>
-      </tr>
-      <tr>
-        <td>Records</td>
-        <td>{{ meta.get('n_records', '-') }}</td>
-      </tr>
-      <tr>
-        <td>Created</td>
-        <td>{{ meta.get('created_at', '-') }}</td>
-      </tr>
-      <tr>
-        <td>Model</td>
-        <td>{{ meta.get('model_type', '-') }}</td>
-      </tr>
-      <tr>
-        <td>Random Seed</td>
-        <td>{{ meta.get('random_seed', '-') }}</td>
-      </tr>
-      <tr>
-        <td>Training Data Hash</td>
-        <td>{{ meta.get('training_data_hash', '-') }}</td>
-      </tr>
+<section class="layout-split detail-layout">
+  <article class="card" data-animate="rise">
+    <div class="section-head">
+      <h2>Metadata</h2>
+      <p>Core attributes stored with this generated dataset.</p>
+    </div>
+    <dl class="meta-list">
+      <div>
+        <dt>Dataset ID</dt>
+        <dd class="mono">{{ dataset_id }}</dd>
+      </div>
+      <div>
+        <dt>Name</dt>
+        <dd>{{ meta.get('dataset_name', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Records</dt>
+        <dd>{{ meta.get('n_records', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Created</dt>
+        <dd>{{ meta.get('created_at', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Model</dt>
+        <dd>{{ meta.get('model_type', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Random Seed</dt>
+        <dd>{{ meta.get('random_seed', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Training Data Hash</dt>
+        <dd class="mono">{{ meta.get('training_data_hash', '-') }}</dd>
+      </div>
       {% if meta.get('quality_score') is not none %}
-      <tr>
-        <td>Quality Score</td>
-        <td>{{ "%.4f"|format(meta.quality_score) }}</td>
-      </tr>
+      <div>
+        <dt>Quality Score</dt>
+        <dd>{{ "%.4f"|format(meta.quality_score) }}</dd>
+      </div>
       {% endif %} {% if meta.get('privacy_score') is not none %}
-      <tr>
-        <td>Privacy Score</td>
-        <td>{{ "%.4f"|format(meta.privacy_score) }}</td>
-      </tr>
+      <div>
+        <dt>Privacy Score</dt>
+        <dd>{{ "%.4f"|format(meta.privacy_score) }}</dd>
+      </div>
       {% endif %}
-    </table>
-  </div>
-</div>
+    </dl>
+  </article>
 
-<div class="card">
-  <h3 class="text-sm mb-1">Data Preview (first 20 rows)</h3>
-  <div class="table-wrap">
-    <table>
-      <tr>
-        {% for col in columns %}
-        <th>{{ col }}</th>
-        {% endfor %}
-      </tr>
-      {% for row in preview %}
-      <tr>
-        {% for col in columns %}
-        <td>{{ row[col] }}</td>
-        {% endfor %}
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
-</div>
+  <article class="card" data-animate="slide">
+    <div class="section-head">
+      <h2>Lineage Snapshot</h2>
+      <p>Reproducibility metadata for audit and traceability.</p>
+    </div>
+    <dl class="meta-list">
+      <div>
+        <dt>Model Type</dt>
+        <dd>{{ lineage.get('model_type', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Random Seed</dt>
+        <dd>{{ lineage.get('random_seed', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Algorithm Version</dt>
+        <dd>{{ lineage.get('algorithm_version', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Training Data Hash</dt>
+        <dd class="mono">{{ lineage.get('training_data_hash', '-') }}</dd>
+      </div>
+      <div>
+        <dt>Hyperparameters</dt>
+        <dd>
+          {% if lineage.get('hyperparameters') %}
+          <ul class="inline-list">
+            {% for key, value in lineage.get('hyperparameters', {}).items() %}
+            <li><span>{{ key }}</span><strong>{{ value }}</strong></li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <span class="text-muted">-</span>
+          {% endif %}
+        </dd>
+      </div>
+    </dl>
+  </article>
+</section>
 
-<div class="mt-2">
-  <a href="{{ url_for('download_dataset', dataset_id=dataset_id) }}" class="btn"
+<section class="section-block" data-animate="rise">
+  <div class="section-head">
+    <h2>Data Preview</h2>
+    <p>First 20 rows for quick visual inspection.</p>
+  </div>
+  <article class="card preview-card">
+    <div class="table-wrap">
+      <table>
+        <tr>
+          {% for col in columns %}
+          <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+        {% for row in preview %}
+        <tr>
+          {% for col in columns %}
+          <td>{{ row[col] }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </article>
+</section>
+
+<div class="button-row results-actions" data-animate="rise">
+  <a
+    href="{{ url_for('download_dataset', dataset_id=dataset_id) }}"
+    class="btn btn-primary"
     >Download CSV</a
   >
-  <a
-    href="{{ url_for('datasets') }}"
-    class="btn btn-outline"
-    style="margin-left: 0.5rem"
+  <a href="{{ url_for('datasets') }}" class="btn btn-secondary"
     >Back to Datasets</a
   >
 </div>
-
 {% endblock %}
