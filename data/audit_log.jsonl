@@ -1,2 +1,10 @@
 {"timestamp": "2026-02-15T13:07:26.635321+00:00", "action": "generate", "resource_id": null, "username": "default_user", "details": {"model": "CTGAN", "n_samples": 50}}
 {"timestamp": "2026-02-15T13:07:27.266342+00:00", "action": "save", "resource_id": "98647b12-951d-4a0f-822a-057feb14b00a", "username": "default_user", "details": {"dataset_name": "CTGAN-50"}}
+{"timestamp": "2026-02-19T08:52:06.553161+00:00", "action": "generate", "resource_id": "d1da5880-3475-4976-acc5-1c600366857d", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
+{"timestamp": "2026-02-19T08:58:27.367984+00:00", "action": "export", "resource_id": "d1da5880-3475-4976-acc5-1c600366857d", "username": "default_user", "details": {"format": "csv"}}
+{"timestamp": "2026-02-19T09:24:25.994194+00:00", "action": "generate", "resource_id": "2ccff95d-fed7-4bef-949b-bd28af70f809", "username": "default_user", "details": {"model": "TVAE", "n_samples": 1000}}
+{"timestamp": "2026-02-27T18:17:11.728962+00:00", "action": "generate", "resource_id": "e3757458-a1a5-4984-9d44-e78e9d5d43b2", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
+{"timestamp": "2026-02-28T05:45:21.415955+00:00", "action": "generate", "resource_id": "0774c5b1-5dbc-4f03-add2-f0059a2e995e", "username": "default_user", "details": {"model": "TVAE", "n_samples": 1000}}
+{"timestamp": "2026-02-28T09:42:57.263178+00:00", "action": "generate", "resource_id": "e162c3b4-3fde-4a4c-a6b4-edc184e04020", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
+{"timestamp": "2026-02-28T09:44:40.976406+00:00", "action": "export", "resource_id": "e162c3b4-3fde-4a4c-a6b4-edc184e04020", "username": "default_user", "details": {"format": "csv"}}
+{"timestamp": "2026-03-05T16:23:46.656527+00:00", "action": "generate", "resource_id": "9574e159-0c34-47cf-ad30-2d6a0d952a07", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
