@@ -47,3 +47,78 @@ logging:
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   console_output: true
   file_output: false
+
+# AI Diagnostic Agent Configuration
+diagnostic_agent:
+  # Storage paths
+  storage:
+    experiments_dir: "data/experiments/"
+    reports_dir: "data/reports/"
+
+  # Optimization settings
+  optimization:
+    max_iterations: 10 # Maximum optimization cycles before stopping
+    stall_threshold: 3 # Consecutive cycles without improvement before stall detection
+    convergence_delta: 0.005 # Minimum improvement to count as progress
+
+  # Enterprise benchmark targets (override defaults from config.py)
+  benchmarks:
+    quality_score: 0.85 # Minimum overall quality score
+    privacy_score: 0.90 # Minimum privacy score
+    utility_accuracy: 0.80 # Minimum cross-classification accuracy
+    utility_f1: 0.75 # Minimum F1 score
+    max_jsd: 0.10 # Maximum Jensen-Shannon divergence
+    max_ks: 0.15 # Maximum Kolmogorov-Smirnov statistic
+    correlation_similarity: 0.90 # Minimum correlation matrix similarity
+    max_bias_amplification: 1.20 # Maximum bias amplification ratio (1.0 = no amplification)
+
+  # Quality classification thresholds
+  classification:
+    excellent:
+      quality_score: 0.90
+      privacy_score: 0.95
+      max_jsd: 0.05
+    acceptable:
+      quality_score: 0.80
+      privacy_score: 0.85
+      max_jsd: 0.10
+    warning:
+      quality_score: 0.70
+      privacy_score: 0.75
+      max_jsd: 0.20
+
+  # Feature diagnostics settings
+  feature_diagnostics:
+    jsd_critical_threshold: 0.20 # JSD above this is critical
+    jsd_warning_threshold: 0.10 # JSD above this is warning
+    ks_critical_threshold: 0.25 # KS statistic above this is critical
+    ks_warning_threshold: 0.15 # KS statistic above this is warning
+    bias_amplification_alert: 1.50 # Alert if amplification exceeds this
+
+  # Diversity monitoring settings
+  diversity:
+    min_unique_ratio: 0.80 # Minimum ratio of unique rows
+    max_duplicate_rate: 0.10 # Maximum acceptable duplicate rate
+    entropy_warning_threshold: 0.5 # Warn if normalized entropy below this
+
+  # Hyperparameter optimization settings
+  hyperparameter_optimization:
+    method: "random" # "random" or "bayesian"
+    n_trials: 20 # Number of trials for optimization
+    timeout_seconds: 3600 # Maximum time for optimization (1 hour)
+    early_stopping_patience: 5 # Stop if no improvement for N trials
+
+  # Model orchestration settings
+  model_orchestration:
+    default_models:
+      - "CTGAN"
+      - "TVAE"
+    parallel_training: false # Train models in parallel (if resources allow)
+    selection_metric: "composite" # "quality_score", "privacy_score", or "composite"
+
+  # Dataset size categories and recommendations
+  dataset_size:
+    critical_threshold: 500 # Below this is critical
+    small_threshold: 1000 # Below this is small
+    medium_threshold: 5000 # Below this is medium, above is large
+    recommended_min_rows: 1000 # Minimum recommended for reliable training

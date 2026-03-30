@@ -8,3 +8,5 @@
 {"timestamp": "2026-02-28T09:42:57.263178+00:00", "action": "generate", "resource_id": "e162c3b4-3fde-4a4c-a6b4-edc184e04020", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
 {"timestamp": "2026-02-28T09:44:40.976406+00:00", "action": "export", "resource_id": "e162c3b4-3fde-4a4c-a6b4-edc184e04020", "username": "default_user", "details": {"format": "csv"}}
 {"timestamp": "2026-03-05T16:23:46.656527+00:00", "action": "generate", "resource_id": "9574e159-0c34-47cf-ad30-2d6a0d952a07", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
+{"timestamp": "2026-03-05T18:20:20.033631+00:00", "action": "generate", "resource_id": "69e0f894-a0db-45b6-b5f5-2bbebcc2ed03", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
+{"timestamp": "2026-03-05T18:25:18.869492+00:00", "action": "generate", "resource_id": "15c2b099-d0ec-42de-9954-d20c084732b5", "username": "default_user", "details": {"model": "TVAE", "n_samples": 1000}}

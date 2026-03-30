@@ -10,7 +10,7 @@ class CTGANEngine:
     """Wrapper around SDV 1.x CTGANSynthesizer for variant generation."""
 
     def __init__(self, embedding_dim: int = 128, generator_dim: tuple = (256, 256),
-                 discriminator_dim: tuple = (256, 256), batch_size: int = 500,
+                 discriminator_dim: tuple = (256, 256), batch_size: int = 50,
                  epochs: int = 300, verbose: bool = False):
         """Initialize CTGAN engine.
 
