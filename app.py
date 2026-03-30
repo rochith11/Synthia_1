@@ -28,6 +28,10 @@ from src.analysis.privacy_analyzer import PrivacyAnalyzer
 from src.analysis.bias_detector import BiasDetector
 from src.storage.dataset_repository import DatasetRepository
 from src.utils.audit_logger import AuditLogger
+from src.ai_diagnostic_agent.diagnostic_agent import DiagnosticAgent
+from src.ai_diagnostic_agent.report_generator import ReportGenerator
+from src.ai_diagnostic_agent.profiling.data_profiler import DataProfiler
+from src.ai_diagnostic_agent.optimization.model_orchestrator import ModelOrchestrator
 
 app = Flask(__name__)
 app.secret_key = 'synthia-dev-key'
@@ -35,6 +39,8 @@ app.secret_key = 'synthia-dev-key'
 # Shared state
 repo = DatasetRepository()
 audit = AuditLogger()
+diagnostic_agent = DiagnosticAgent()
+report_generator = ReportGenerator()
 
 # Store latest run results in memory for display
 _latest_run = {}
@@ -231,6 +237,128 @@ def dataset_detail(dataset_id):
     except FileNotFoundError:
         flash("Dataset not found.", "error")
         return redirect(url_for('datasets'))
+
+
+# ------------------------------------------------------------------
+# Diagnostic Agent API Routes
+# ------------------------------------------------------------------
+
+@app.route('/api/diagnostic/run', methods=['POST'])
+def api_diagnostic_run():
+    """Run a diagnostic cycle on the latest generation results."""
+    with _run_lock:
+        run = dict(_latest_run)
+
+    if not run or 'validation' not in run or 'privacy' not in run:
+        return jsonify({'error': 'No generation results available. Run a generation first.'}), 400
+
+    train_data, test_data = _get_data()
+
+    # Reconstruct report dicts from stored run data
+    val_dict = {
+        'overall_quality_score': run['validation'].get('quality_score', 0),
+        'statistical_metrics': {
+            'summary': {
+                'mean_ks_statistic': run['validation'].get('mean_ks', 0),
+                'mean_jsd': run['validation'].get('mean_jsd', 0),
+                'max_jsd': run['validation'].get('max_jsd', 0),
+                'correlation_similarity': run['validation'].get('corr_sim'),
+            },
+            'ks_tests': run['validation'].get('ks_tests', {}),
+            'js_divergences': run['validation'].get('js_divergences', {}),
+        },
+        'utility_metrics': {
+            'cross_test': {
+                'synthetic_to_real': {
+                    'accuracy': run['validation'].get('accuracy', 0),
+                    'f1_score': run['validation'].get('f1', 0),
+                    'auc': run['validation'].get('auc', 0),
+                },
+            },
+        },
+    }
+
+    priv_dict = {
+        'privacy_score': run['privacy'].get('score', 0),
+        'nearest_neighbor_distances': run['privacy'].get('nnd', {}),
+        'reidentification_risk': run['privacy'].get('risk', {}),
+    }
+
+    bias_dict = run.get('bias', {})
+
+    config = run.get('config', {})
+    current_config = {
+        'model_type': config.get('model_type', 'CTGAN'),
+        'epochs': config.get('epochs', 300),
+        'batch_size': 500,
+        'n_samples': config.get('n_samples', 1000),
+        'embedding_dim': 128,
+    }
+
+    import pandas as pd
+    synthetic = pd.DataFrame(run.get('synthetic_preview', []))
+
+    try:
+        diag_report = diagnostic_agent.run_diagnostic_cycle(
+            synthetic_data=synthetic,
+            real_data=test_data,
+            validation_report=val_dict,
+            privacy_report=priv_dict,
+            bias_report=bias_dict,
+            training_config=current_config,
+            current_config=current_config,
+        )
+        return jsonify(diag_report.to_dict())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/diagnostic/status')
+def api_diagnostic_status():
+    """Get current diagnostic agent status."""
+    summary = diagnostic_agent.get_optimization_summary()
+    return jsonify(summary)
+
+
+@app.route('/api/diagnostic/report')
+def api_diagnostic_report():
+    """Get the latest diagnostic report."""
+    fmt = request.args.get('format', 'json')
+
+    if not diagnostic_agent.optimization_history:
+        return jsonify({'error': 'No diagnostic cycles run yet.'}), 404
+
+    latest = diagnostic_agent.optimization_history[-1]
+
+    if fmt == 'json':
+        return jsonify(latest.to_dict())
+    else:
+        content = report_generator.generate_diagnostic_report(latest, format=fmt)
+        mimetype = 'text/html' if fmt == 'html' else 'text/plain'
+        return content, 200, {'Content-Type': mimetype}
+
+
+@app.route('/api/diagnostic/experiments')
+def api_diagnostic_experiments():
+    """List all tracked experiments."""
+    experiments = diagnostic_agent.experiment_tracker.list_experiments()
+    return jsonify([exp.to_dict() for exp in experiments])
+
+
+@app.route('/api/diagnostic/benchmarks')
+def api_diagnostic_benchmarks():
+    """Get benchmark status dashboard."""
+    dashboard = diagnostic_agent.get_benchmark_dashboard()
+    return jsonify({'dashboard': dashboard})
+
+
+@app.route('/api/diagnostic/profile', methods=['POST'])
+def api_diagnostic_profile():
+    """Profile the training dataset."""
+    train_data, _ = _get_data()
+    profiler = DataProfiler()
+    profile = profiler.profile_dataset(train_data)
+    return jsonify(profile.to_dict())
 
 
 if __name__ == '__main__':

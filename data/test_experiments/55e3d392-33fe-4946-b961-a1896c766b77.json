@@ -1,0 +1,17 @@
+{
+  "experiment_id": "55e3d392-33fe-4946-b961-a1896c766b77",
+  "timestamp": "2026-03-05T23:43:26.590896",
+  "dataset_version": "",
+  "preprocessing_config": {},
+  "model_type": "CTGAN",
+  "model_config": {},
+  "training_config": {
+    "epochs": 300
+  },
+  "metrics": {
+    "quality_score": 0.72,
+    "privacy_score": 0.85
+  },
+  "diagnostic_summary": {},
+  "status": "completed"
+}

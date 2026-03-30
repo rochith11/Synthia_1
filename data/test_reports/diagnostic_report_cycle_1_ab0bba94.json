@@ -1,0 +1,29 @@
+{
+  "report_id": "ab0bba94",
+  "cycle_number": 1,
+  "metric_analysis": {
+    "quality_metrics": {
+      "quality_score": {
+        "value": 0.72,
+        "level": "Acceptable"
+      }
+    },
+    "utility_metrics": {},
+    "privacy_metrics": {},
+    "bias_metrics": {},
+    "weakest_metrics": [],
+    "benchmark_deltas": {},
+    "overall_status": "Acceptable",
+    "timestamp": "2026-03-05T23:44:02.588665"
+  },
+  "root_causes": [],
+  "column_diagnostics": [],
+  "correlation_analysis": null,
+  "diversity_report": null,
+  "constraint_validation": null,
+  "recommendations": [],
+  "experiment_plan": null,
+  "benchmarks_met": false,
+  "optimization_stalled": false,
+  "timestamp": "2026-03-05T23:44:02.588665"
+}
