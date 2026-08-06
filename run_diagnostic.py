@@ -50,6 +50,7 @@ def parse_args():
     run_parser.add_argument("--seed", type=int, default=None, help="Random seed")
     run_parser.add_argument("--epochs", type=int, default=None, help="Training epochs")
     run_parser.add_argument("--disease", type=str, default=None, help="Filter by disease name")
+    run_parser.add_argument("--training-data", type=str, default=None, help="Path to a CSV file to use as training data")
     run_parser.add_argument("--format", type=str, default='text', choices=['text', 'html', 'json'],
                            help="Report output format")
 
@@ -80,10 +81,10 @@ def parse_args():
     return parser.parse_args()
 
 
-def load_data(disease=None):
+def load_data(disease=None, training_file=None):
     """Load training and test data."""
     try:
-        train = load_training_data()
+        train = load_training_data(training_file=training_file)
         test = load_test_data()
     except FileNotFoundError:
         print_info("Sample data not found — creating...")
@@ -115,7 +116,7 @@ def cmd_run(args):
     print_info(f"Config: model={model_type}, samples={n_samples}, epochs={epochs}, seed={seed}")
 
     # Load data
-    train_data, test_data = load_data(args.disease)
+    train_data, test_data = load_data(args.disease, args.training_data)
     print_success(f"Training: {len(train_data)} rows, Test: {len(test_data)} rows")
 
     # Generate

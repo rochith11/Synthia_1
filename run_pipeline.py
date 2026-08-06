@@ -42,6 +42,7 @@ def parse_args():
     parser.add_argument("--seed", type=int, help="Random seed")
     parser.add_argument("--epochs", type=int, help="Training epochs")
     parser.add_argument("--disease", type=str, help="Filter by disease name")
+    parser.add_argument("--training-data", type=str, help="Path to a CSV file to use as training data")
     parser.add_argument("--config", type=str, default=None, help="Config YAML path")
     parser.add_argument("--user", type=str, default="default_user", help="Username")
     return parser.parse_args()
@@ -76,7 +77,7 @@ def main():
     # ── 2. Load data ──────────────────────────────────────────────────
     print_section("LOADING DATA")
     try:
-        train_data = load_training_data()
+        train_data = load_training_data(training_file=args.training_data)
         test_data = load_test_data()
     except FileNotFoundError:
         print_info("Sample data not found — creating...")

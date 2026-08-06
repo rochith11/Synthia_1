@@ -47,10 +47,10 @@ _latest_run = {}
 _run_lock = threading.Lock()
 
 
-def _get_data():
+def _get_data(training_data_path=None):
     """Load training and test data, creating sample if needed."""
     try:
-        train = load_training_data()
+        train = load_training_data(training_file=training_data_path)
         test = load_test_data()
     except FileNotFoundError:
         _, train, test = create_sample_data()
@@ -85,8 +85,9 @@ def generate():
     epochs = int(request.form.get('epochs', 100))
     batch_size = int(request.form.get('batch_size', 500))
     disease = request.form.get('disease', '').strip() or None
+    training_data_path = request.form.get('training_data_path', '').strip() or None
 
-    train_data, test_data = _get_data()
+    train_data, test_data = _get_data(training_data_path=training_data_path)
 
     if disease:
         train_data = train_data[train_data['disease'] == disease].reset_index(drop=True)

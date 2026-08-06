@@ -1,8 +1,34 @@
 """Data loader utilities for Synthia."""
 
-import pandas as pd
+import os
 from pathlib import Path
-from typing import Tuple, Optional
+from typing import Optional, Tuple
+
+import pandas as pd
+import yaml
+
+
+def _resolve_data_file(data_dir: str, candidates: list[str]) -> Optional[Path]:
+    """Resolve the first existing data file from a list of candidates."""
+    for candidate in candidates:
+        if not candidate:
+            continue
+
+        path = Path(candidate)
+        if path.is_absolute():
+            if path.exists():
+                return path
+            continue
+
+        for base in (Path.cwd(), Path(data_dir)):
+            resolved = (base / path).resolve()
+            if resolved.exists():
+                return resolved
+
+        if path.exists():
+            return path.resolve()
+
+    return None
 
 
 def load_sample_data(data_dir: str = 'data') -> pd.DataFrame:
@@ -21,20 +47,43 @@ def load_sample_data(data_dir: str = 'data') -> pd.DataFrame:
         raise FileNotFoundError(f"Sample data not found at {sample_file}")
 
 
-def load_training_data(data_dir: str = 'data') -> pd.DataFrame:
-    """Load training split (70% of data).
+def load_training_data(data_dir: str = 'data', training_file: Optional[str] = None) -> pd.DataFrame:
+    """Load training data for model training.
 
     Args:
         data_dir: Directory containing data files
+        training_file: Optional explicit path to a training CSV file
 
     Returns:
         Training DataFrame
     """
-    train_file = Path(data_dir) / 'sample_real_variants_train.csv'
-    if train_file.exists():
-        return pd.read_csv(train_file)
-    else:
-        raise FileNotFoundError(f"Training data not found at {train_file}")
+    candidates = []
+
+    if training_file:
+        candidates.append(training_file)
+
+    env_path = os.getenv('SYNTHIA_TRAINING_DATA')
+    if env_path:
+        candidates.append(env_path)
+
+    config_path = Path(__file__).resolve().parents[2] / 'config.yaml'
+    if config_path.exists():
+        with open(config_path, 'r', encoding='utf-8') as handle:
+            config = yaml.safe_load(handle) or {}
+        configured_path = config.get('data', {}).get('sample_dir')
+        if configured_path:
+            candidates.append(configured_path)
+
+    candidates.extend([
+        str(Path(data_dir) / 'training.csv'),
+        str(Path(data_dir) / 'sample_real_variants_train.csv'),
+    ])
+
+    resolved_path = _resolve_data_file(data_dir, candidates)
+    if resolved_path is None:
+        raise FileNotFoundError(f"Training data not found. Tried: {candidates}")
+
+    return pd.read_csv(resolved_path)
 
 
 def load_test_data(data_dir: str = 'data') -> pd.DataFrame:

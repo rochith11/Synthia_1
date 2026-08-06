@@ -37,7 +37,8 @@ bias:
 
 # Data Paths
 data:
-  sample_dir: "data/"
+  training_data_file: "data/training.csv"
+  sample_dir: "data/training.csv"
   datasets_dir: "data/datasets/"
   models_dir: "models/"
 
