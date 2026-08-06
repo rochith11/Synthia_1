@@ -1,21 +1,6 @@
 {% extends "base.html" %} {% block title %}Synthia | Generate{% endblock %} {%
 block content %}
 <section class="hero" data-animate="rise">
-<<<<<<< Updated upstream
-  <p class="eyebrow">Synthetic Health Data Studio</p>
-  <h1 class="page-title">
-    Generate realistic, privacy-aware records with a cleaner workflow.
-  </h1>
-  <p class="lead">
-    Tune model settings, run generation, and inspect quality, privacy, and bias
-    outputs in one streamlined interface.
-  </p>
-  <div class="hero-pills">
-    <span class="pill">CTGAN + TVAE</span>
-    <span class="pill">Validation Built In</span>
-    <span class="pill">Bias + Privacy Checks</span>
-  </div>
-=======
   
   <h1
   class="page-title"
@@ -23,10 +8,10 @@ block content %}
   Privacy-Preserving Synthetic Data Generation
 </h1>
  
->>>>>>> Stashed changes
+  
 </section>
 
-<section class="layout-split">
+<section class="layout-split centered">
   <article class="card elevated" data-animate="rise">
     <div class="section-head">
       <h2>Generation Configuration</h2>
@@ -140,43 +125,5 @@ block content %}
       </div>
     </form>
   </article>
-
-  <aside class="stack-md" data-animate="slide">
-    <article class="card accent-card">
-      <h3>How this run flows</h3>
-      <ol class="clean-list">
-        <li>Train selected model on the source training data.</li>
-        <li>Generate synthetic samples at the configured volume.</li>
-        <li>Run validation, privacy, and bias analysis checks.</li>
-        <li>Save data plus metadata for reproducibility and export.</li>
-      </ol>
-    </article>
-
-    <article class="card">
-      <h3>Current defaults</h3>
-      <dl class="meta-list">
-        <div>
-          <dt>Model</dt>
-          <dd>{{ defaults.get('model_type', 'CTGAN') }}</dd>
-        </div>
-        <div>
-          <dt>Samples</dt>
-          <dd>{{ defaults.get('n_samples', 1000) }}</dd>
-        </div>
-        <div>
-          <dt>Random Seed</dt>
-          <dd>{{ defaults.get('random_seed', 42) }}</dd>
-        </div>
-        <div>
-          <dt>Epochs</dt>
-          <dd>{{ defaults.get('epochs', 300) }}</dd>
-        </div>
-        <div>
-          <dt>Batch Size</dt>
-          <dd>{{ defaults.get('batch_size', 500) }}</dd>
-        </div>
-      </dl>
-    </article>
-  </aside>
 </section>
 {% endblock %}

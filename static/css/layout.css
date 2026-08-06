@@ -105,6 +105,7 @@
   transition: color 180ms ease, background-color 180ms ease;
 }
 
+
 .site-nav a:hover {
   color: var(--color-text);
   background: #ffffff;
@@ -172,6 +173,15 @@
   grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.9fr);
   gap: var(--space-3);
   align-items: start;
+}
+
+.layout-split.centered {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.layout-split.centered > article {
+  width: min(760px, 100%);
 }
 
 .detail-layout {
