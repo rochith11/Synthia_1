@@ -11,13 +11,15 @@ import warnings
 import threading
 from datetime import datetime
 
+import pandas as pd
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings('ignore')
 
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 
 from src.utils.config_manager import ConfigManager
-from src.utils.data_loader import load_training_data, load_test_data, create_sample_data
+from src.utils.data_loader import load_training_data, load_test_data
 # Support different import paths (IDE vs runtime)
 try:
     from src.models.generation_config import GenerationConfig
@@ -395,18 +397,37 @@ def datasets():
 
 @app.route('/datasets/<dataset_id>/download')
 def download_dataset(dataset_id):
-    """Download a dataset as CSV."""
+    """Download a dataset in the requested format."""
     try:
         data, _ = repo.load_dataset(dataset_id)
-        buf = io.StringIO()
-        data.to_csv(buf, index=False)
-        buf.seek(0)
-        audit.log("export", resource_id=dataset_id, details={"format": "csv"})
+        fmt = request.args.get('fmt', 'csv').lower()
+        export_formats = {
+            'csv': ('text/csv', 'csv'),
+            'tsv': ('text/tab-separated-values', 'tsv'),
+            'xlsx': ('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx'),
+        }
+        if fmt not in export_formats:
+            flash("Unsupported download format.", "error")
+            return redirect(url_for('datasets'))
+
+        mimetype, extension = export_formats[fmt]
+        if fmt == 'xlsx':
+            buf = io.BytesIO()
+            with pd.ExcelWriter(buf, engine='openpyxl') as writer:
+                data.to_excel(writer, index=False)
+            buf.seek(0)
+        else:
+            text_buf = io.StringIO()
+            data.to_csv(text_buf, index=False, sep='\t' if fmt == 'tsv' else ',')
+            buf = io.BytesIO(text_buf.getvalue().encode('utf-8'))
+            buf.seek(0)
+
+        audit.log("export", resource_id=dataset_id, details={"format": fmt})
         return send_file(
-            io.BytesIO(buf.getvalue().encode()),
-            mimetype='text/csv',
+            buf,
+            mimetype=mimetype,
             as_attachment=True,
-            download_name=f"{dataset_id}.csv"
+            download_name=f"{dataset_id}.{extension}"
         )
     except FileNotFoundError:
         flash("Dataset not found.", "error")

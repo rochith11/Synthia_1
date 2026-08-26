@@ -10,3 +10,5 @@
 {"timestamp": "2026-03-05T16:23:46.656527+00:00", "action": "generate", "resource_id": "9574e159-0c34-47cf-ad30-2d6a0d952a07", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
 {"timestamp": "2026-03-05T18:20:20.033631+00:00", "action": "generate", "resource_id": "69e0f894-a0db-45b6-b5f5-2bbebcc2ed03", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
 {"timestamp": "2026-03-05T18:25:18.869492+00:00", "action": "generate", "resource_id": "15c2b099-d0ec-42de-9954-d20c084732b5", "username": "default_user", "details": {"model": "TVAE", "n_samples": 1000}}
+{"timestamp": "2026-08-26T12:55:24.331637+00:00", "action": "generate", "resource_id": "72e8b72a-9872-407e-b08b-b3610fa16248", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
+{"timestamp": "2026-08-26T13:06:41.252933+00:00", "action": "generate", "resource_id": "6c15d511-c772-4f5e-ab69-e929a68b4700", "username": "default_user", "details": {"model": "CTGAN", "n_samples": 1000}}
