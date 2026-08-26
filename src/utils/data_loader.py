@@ -3,6 +3,17 @@
 import pandas as pd
 from pathlib import Path
 from typing import Tuple, Optional
+from sklearn.model_selection import train_test_split
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_project_path(file_path: str) -> Path:
+    """Resolve relative file paths from the project root."""
+    path = Path(file_path)
+    if path.is_absolute():
+        return path
+    return PROJECT_ROOT / path
 
 
 def load_sample_data(data_dir: str = 'data') -> pd.DataFrame:
@@ -44,56 +55,40 @@ def load_test_data(data_dir: str = 'data') -> pd.DataFrame:
         f"Test data not found at {test_file}"
     )
 
+def create_train_test_split(
+    input_file="data/real_variants_preprocessed.csv",
+    train_file="data/sample_real_variants_train.csv",
+    test_file="data/sample_real_variants_test.csv",
+    test_size=0.30,
+    random_seed=42
+):
+    """Create and save train/test datasets."""
+    input_path = _resolve_project_path(input_file)
+    train_path = _resolve_project_path(train_file)
+    test_path = _resolve_project_path(test_file)
 
-def create_sample_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Create and save sample variant data with train/test split.
+    if not input_path.exists():
+        raise FileNotFoundError(f"Input data not found at {input_path}")
 
-    Returns:
-        Tuple of (full_data, train_data, test_data)
-    """
-    import numpy as np
+    df = pd.read_csv(input_path)
 
-    # Random seed for reproducibility
-    np.random.seed(42)
+    train_df, test_df = train_test_split(
+        df,
+        test_size=test_size,
+        random_state=random_seed,
+        shuffle=True
+    )
 
-    # Sample data configuration
-    genes = ['CFTR', 'DMD', 'HBB', 'F8', 'HEXA']
-    chromosomes = ['chr7', 'chrX', 'chr11', 'chrX', 'chr15']
-    variant_types = ['SNV', 'Insertion', 'Deletion', 'Duplication']
-    clinical_sigs = ['Pathogenic', 'Likely Pathogenic', 'VUS', 'Benign']
-    diseases = ['Cystic Fibrosis', 'Duchenne Muscular Dystrophy', 'Sickle Cell Disease']
-    inheritance_patterns = ['Autosomal Dominant', 'Autosomal Recessive', 'X-linked']
+    train_path.parent.mkdir(parents=True, exist_ok=True)
+    test_path.parent.mkdir(parents=True, exist_ok=True)
+    train_df.to_csv(train_path, index=False)
+    test_df.to_csv(test_path, index=False)
 
-    # Create 100 sample records
-    n_records = 100
+    print(f"[+] Total records: {len(df)}")
+    print(f"[+] Training records: {len(train_df)}")
+    print(f"[+] Test records: {len(test_df)}")
 
-    data = {
-        'gene_symbol': np.random.choice(genes, n_records),
-        'chromosome': np.random.choice(chromosomes, n_records),
-        'variant_type': np.random.choice(variant_types, n_records),
-        'clinical_significance': np.random.choice(clinical_sigs, n_records),
-        'disease': np.random.choice(diseases, n_records),
-        'allele_frequency': np.random.uniform(0.001, 0.5, n_records),
-        'inheritance_pattern': np.random.choice(inheritance_patterns, n_records)
-    }
+    return train_df, test_df
 
-    df = pd.DataFrame(data)
-
-    # Create 70/30 split
-    split_index = int(0.7 * len(df))
-    train_df = df[:split_index].reset_index(drop=True)
-    test_df = df[split_index:].reset_index(drop=True)
-
-    # Save to CSV files
-    Path('data').mkdir(exist_ok=True)
-    Path('data/datasets').mkdir(exist_ok=True)
-
-    df.to_csv('data/sample_real_variants.csv', index=False)
-    train_df.to_csv('data/sample_real_variants_train.csv', index=False)
-    test_df.to_csv('data/sample_real_variants_test.csv', index=False)
-
-    print(f"[+] Created sample data with {len(df)} records")
-    print(f"[+] Training set: {len(train_df)} records (70%)")
-    print(f"[+] Test set: {len(test_df)} records (30%)")
-
-    return df, train_df, test_df
+if __name__ == "__main__":
+    create_train_test_split()
