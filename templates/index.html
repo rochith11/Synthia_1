@@ -5,7 +5,7 @@ block content %}
   <h1
   class="page-title"
   style="display: flex; justify-content: center; align-items: center;">
-  Privacy-Preserving Synthetic Data Generation
+  Privacy Preserving Synthetic Data Generation
 </h1>
  
   
@@ -15,7 +15,7 @@ block content %}
   <article class="card elevated" data-animate="rise">
     <div class="section-head">
       <h2>Generation Configuration</h2>
-      <p>These controls map directly to existing engine parameters.</p>
+     
     </div>
 
     <form
@@ -94,7 +94,7 @@ block content %}
         </div>
 
         <div class="field">
-          <label for="disease">Disease Filter (optional)</label>
+          <label for="disease">Disease Filter</label>
           <select id="disease" name="disease">
             <option value="">All Diseases</option>
             <option value="Cystic Fibrosis">Cystic Fibrosis</option>
@@ -119,9 +119,6 @@ block content %}
         >
           Generate Synthetic Data
         </button>
-        <a href="{{ url_for('datasets') }}" class="btn btn-ghost"
-          >Browse Datasets</a
-        >
       </div>
     </form>
   </article>

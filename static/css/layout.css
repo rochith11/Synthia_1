@@ -213,6 +213,10 @@
   align-items: center;
 }
 
+.layout-split.centered .button-row {
+  justify-content: center;
+}
+
 .table-wrap {
   overflow-x: auto;
 }

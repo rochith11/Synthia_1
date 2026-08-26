@@ -210,13 +210,6 @@ block content %}
         {% endfor %}
       </table>
     </div>
-    {% endif %} {% if run.bias.recommendations %}
-    <h3 class="subhead">Recommendations</h3>
-    <ul class="note-list">
-      {% for rec in run.bias.recommendations %}
-      <li>{{ rec }}</li>
-      {% endfor %}
-    </ul>
     {% endif %} {% if not run.bias.feature_distributions and not
     run.bias.amplification.flagged and not run.bias.recommendations %}
     <p class="text-muted">No significant bias indicators were reported.</p>

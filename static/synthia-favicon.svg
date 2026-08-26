@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Synthia">
+  <defs>
+    <linearGradient id="synthia-mark" x1="14" y1="8" x2="50" y2="57" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#20b6aa" />
+      <stop offset="1" stop-color="#123e82" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#ffffff" />
+  <path d="M48 11C39 5 23 9 18 19c-5 10 2 16 13 21 11 5 17 10 12 18-5 8-18 9-27 2" fill="none" stroke="url(#synthia-mark)" stroke-linecap="round" stroke-width="6" />
+  <g fill="none" stroke="#178c97" stroke-linecap="round" stroke-width="2.5">
+    <path d="M18 21h11" />
+    <path d="M20 28h13" />
+    <path d="M31 37h14" />
+    <path d="M34 44h11" />
+  </g>
+</svg>
