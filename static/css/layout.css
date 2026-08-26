@@ -63,8 +63,17 @@
 .brand-mark {
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
+  width: 280px;
+  height: 88px;
   text-decoration: none;
+}
+
+.brand-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .brand-badge {
@@ -104,6 +113,7 @@
   border-radius: 999px;
   transition: color 180ms ease, background-color 180ms ease;
 }
+
 
 .site-nav a:hover {
   color: var(--color-text);
@@ -174,6 +184,15 @@
   align-items: start;
 }
 
+.layout-split.centered {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.layout-split.centered > article {
+  width: min(760px, 100%);
+}
+
 .detail-layout {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -231,6 +250,11 @@
 }
 
 @media (max-width: 600px) {
+  .brand-mark {
+    width: 220px;
+    height: 68px;
+  }
+
   .container {
     width: min(1160px, calc(100% - 1.2rem));
   }

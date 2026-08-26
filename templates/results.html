@@ -23,21 +23,25 @@ block content %}
   </article>
   <article class="kpi-card">
     <p class="kpi-label">Quality Score</p>
-    <p
-      class="kpi-value metric-value"
-      data-countup="{{ '%.4f'|format(run.validation.quality_score) }}"
-    >
-      {{ "%.4f"|format(run.validation.quality_score) }}
+    <p class="kpi-value metric-value">
+      {{ "%.2f%%"|format(run.validation.quality_score * 100) }}
     </p>
+    <div class="score-progress" role="progressbar" aria-label="Quality score"
+      aria-valuemin="0" aria-valuemax="1" aria-valuenow="{{ run.validation.quality_score }}">
+      <div class="score-progress-fill quality-fill"
+        style="width: {{ (run.validation.quality_score * 100)|round(1) }}%"></div>
+    </div>
   </article>
   <article class="kpi-card">
     <p class="kpi-label">Privacy Score</p>
-    <p
-      class="kpi-value metric-value"
-      data-countup="{{ '%.4f'|format(run.privacy.score) }}"
-    >
-      {{ "%.4f"|format(run.privacy.score) }}
+    <p class="kpi-value metric-value">
+      {{ "%.2f%%"|format(run.privacy.score * 100) }}
     </p>
+    <div class="score-progress" role="progressbar" aria-label="Privacy score"
+      aria-valuemin="0" aria-valuemax="1" aria-valuenow="{{ run.privacy.score }}">
+      <div class="score-progress-fill privacy-fill"
+        style="width: {{ (run.privacy.score * 100)|round(1) }}%"></div>
+    </div>
   </article>
 </section>
 
@@ -60,30 +64,19 @@ block content %}
         <p class="metric-label">Max JSD</p>
         <p class="metric-value">{{ "%.4f"|format(run.validation.max_jsd) }}</p>
       </div>
-      <div class="metric">
-        <p class="metric-label">Correlation Similarity</p>
-        {% if run.validation.corr_sim is not none %}
-        <p class="metric-value">{{ "%.4f"|format(run.validation.corr_sim) }}</p>
-        {% else %}
-        <p class="metric-value">N/A</p>
-        {% endif %}
-      </div>
     </div>
 
     <h3 class="subhead">ML Utility (Synthetic to Real)</h3>
-    <div class="metric-grid compact">
-      <div class="metric">
-        <p class="metric-label">Accuracy</p>
-        <p class="metric-value">{{ "%.4f"|format(run.validation.accuracy) }}</p>
+    <div class="utility-chart" role="img" aria-label="Horizontal bar chart of machine learning utility metrics">
+      {% for label, value in [('Accuracy', run.validation.accuracy), ('F1 Score', run.validation.f1), ('AUC', run.validation.auc)] %}
+      <div class="utility-chart-row">
+        <div class="utility-chart-label">{{ label }}</div>
+        <div class="utility-chart-track">
+          <div class="utility-chart-bar" style="width: {{ ([value * 100, 100]|min)|round(1) }}%"></div>
+        </div>
+        <div class="utility-chart-value">{{ "%.4f"|format(value) }}</div>
       </div>
-      <div class="metric">
-        <p class="metric-label">F1 Score</p>
-        <p class="metric-value">{{ "%.4f"|format(run.validation.f1) }}</p>
-      </div>
-      <div class="metric">
-        <p class="metric-label">AUC</p>
-        <p class="metric-value">{{ "%.4f"|format(run.validation.auc) }}</p>
-      </div>
+      {% endfor %}
     </div>
 
     {% if run.validation.js_divergences %}
@@ -207,8 +200,7 @@ block content %}
           <th>Column</th>
           <th>Real Ratio</th>
           <th>Synthetic Ratio</th>
-        </tr>
-        {% for col in run.bias.amplification.flagged %} {% set info =
+        </tr>     {% for col in run.bias.amplification.flagged %} {% set info =
         run.bias.amplification.columns[col] %}
         <tr>
           <td>{{ col }}</td>
@@ -257,7 +249,7 @@ block content %}
   </article>
 </section>
 
-<div class="button-row results-actions" data-animate="rise">
+<div class="button-row results-actions">
   <a href="{{ url_for('datasets') }}" class="btn btn-secondary"
     >View All Datasets</a
   >

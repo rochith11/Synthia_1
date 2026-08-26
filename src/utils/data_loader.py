@@ -22,35 +22,27 @@ def load_sample_data(data_dir: str = 'data') -> pd.DataFrame:
 
 
 def load_training_data(data_dir: str = 'data') -> pd.DataFrame:
-    """Load training split (70% of data).
-
-    Args:
-        data_dir: Directory containing data files
-
-    Returns:
-        Training DataFrame
-    """
+    """Load the already-created training dataset."""
     train_file = Path(data_dir) / 'sample_real_variants_train.csv'
+
     if train_file.exists():
         return pd.read_csv(train_file)
-    else:
-        raise FileNotFoundError(f"Training data not found at {train_file}")
+
+    raise FileNotFoundError(
+        f"Training data not found at {train_file}"
+    )
 
 
 def load_test_data(data_dir: str = 'data') -> pd.DataFrame:
-    """Load test split (30% of data).
-
-    Args:
-        data_dir: Directory containing data files
-
-    Returns:
-        Test DataFrame
-    """
+    """Load the already-created test dataset."""
     test_file = Path(data_dir) / 'sample_real_variants_test.csv'
+
     if test_file.exists():
         return pd.read_csv(test_file)
-    else:
-        raise FileNotFoundError(f"Test data not found at {test_file}")
+
+    raise FileNotFoundError(
+        f"Test data not found at {test_file}"
+    )
 
 
 def create_sample_data() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:

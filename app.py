@@ -9,6 +9,7 @@ import os
 import io
 import warnings
 import threading
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 warnings.filterwarnings('ignore')
@@ -45,6 +46,112 @@ report_generator = ReportGenerator()
 # Store latest run results in memory for display
 _latest_run = {}
 _run_lock = threading.Lock()
+
+# Keep trained generators in memory so they are reused
+_generator_cache = {}
+# Directory for persisted trained models
+MODEL_CACHE_DIR = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "data",
+    "models"
+)
+os.makedirs(MODEL_CACHE_DIR, exist_ok=True)
+
+def format_datetime(value):
+    """Return a clean display format for ISO timestamps."""
+    if not value:
+        return '-'
+
+    try:
+        dt = value
+        if isinstance(value, str):
+            dt = value.replace('Z', '+00:00')
+            dt = dt[:19] if len(dt) >= 19 and 'T' in dt and '+' not in dt and '-' not in dt[10:] else dt
+            dt = datetime.fromisoformat(dt)
+        elif hasattr(value, 'isoformat'):
+            dt = value
+        else:
+            return str(value)
+
+        return dt.strftime('%d %b %Y, %I:%M %p')
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def build_metric_chart(datasets, metric_key, color='#2e8a7d', width=420, height=150):
+    """Create a compact analytical line/area chart for dataset quality/privacy values."""
+    values = [
+        {'label': ds.get('dataset_name', 'unnamed')[:8], 'value': ds.get(metric_key)}
+        for ds in datasets
+        if ds.get(metric_key) is not None
+    ]
+
+    if not values:
+        return '<svg viewBox="0 0 420 150" width="100%" height="100%"></svg>'
+
+    min_value = min(v['value'] for v in values)
+    max_value = max(v['value'] for v in values)
+    avg_value = sum(v['value'] for v in values) / len(values)
+    value_range = max(max_value - min_value, 0.001)
+
+    chart_left = 30
+    chart_right = 12
+    chart_top = 14
+    chart_bottom = 28
+    plot_width = width - chart_left - chart_right
+    plot_height = height - chart_top - chart_bottom
+
+    points = []
+    for idx, item in enumerate(values):
+        x = chart_left + (idx / max(len(values) - 1, 1)) * plot_width
+        y = chart_top + plot_height - ((item['value'] - min_value) / value_range) * plot_height
+        points.append((x, y, item['label'], item['value']))
+
+    line_points = ' '.join(f'{x:.1f},{y:.1f}' for x, y, _, _ in points)
+    area_points = ' '.join(f'{x:.1f},{y:.1f}' for x, y, _, _ in points)
+    area_points += f' {points[-1][0]:.1f},{height - chart_bottom:.1f} {points[0][0]:.1f},{height - chart_bottom:.1f}'
+
+    avg_y = chart_top + plot_height - ((avg_value - min_value) / value_range) * plot_height
+
+    grid_lines = []
+    for i in range(5):
+        ratio = i / 4
+        y = chart_top + ratio * plot_height
+        value_label = max_value - ratio * value_range
+        grid_lines.append(
+            f'<line x1="{chart_left}" y1="{y}" x2="{width - chart_right}" y2="{y}" stroke="#dfeae6" stroke-width="1"/>'
+        )
+        grid_lines.append(
+            f'<text x="{chart_left - 6}" y="{y + 4}" font-size="9" fill="#5d726b" text-anchor="end">{value_label:.2f}</text>'
+        )
+
+    labels = []
+    markers = []
+    for x, y, label, value in points:
+        markers.append(
+            f'<circle cx="{x}" cy="{y}" r="3.6" fill="{color}" stroke="#ffffff" stroke-width="1.3"/>'
+        )
+        labels.append(
+            f'<text x="{x}" y="{height - 10}" font-size="8" fill="#4b6660" text-anchor="middle">{label}</text>'
+        )
+
+    return (
+        f'<svg viewBox="0 0 {width} {height}" width="100%" height="100%" role="img" aria-label="Dataset metric analysis chart">'
+        f'<rect width="100%" height="100%" fill="transparent"/>'
+        f'{"".join(grid_lines)}'
+        f'<line x1="{chart_left}" y1="{chart_top}" x2="{chart_left}" y2="{height - chart_bottom}" stroke="#617972" stroke-width="1.2"/>'
+        f'<line x1="{chart_left}" y1="{height - chart_bottom}" x2="{width - chart_right}" y2="{height - chart_bottom}" stroke="#617972" stroke-width="1.2"/>'
+        f'<line x1="{chart_left}" y1="{avg_y}" x2="{width - chart_right}" y2="{avg_y}" stroke="#9bbab2" stroke-dasharray="4 4" stroke-width="1.2"/>'
+        f'<text x="{width - 16}" y="{avg_y - 4}" text-anchor="end" font-size="8" fill="#506c63">Avg</text>'
+        f'<polygon points="{area_points}" fill="{color}" opacity="0.12"/>'
+        f'<polyline points="{line_points}" fill="none" stroke="{color}" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/>'
+        f'{"".join(markers)}'
+        f'{"".join(labels)}'
+        f'</svg>'
+    )
+
+
+app.jinja_env.filters['format_datetime'] = format_datetime
 
 
 def _get_data():
@@ -103,8 +210,85 @@ def generate():
         hyperparameters={'epochs': epochs, 'batch_size': batch_size},
         disease_condition=disease,
     )
-    generator = SyntheticDataGenerator(config=config)
-    generator.train(train_data, config=config)
+    # Create a unique key for the model configuration
+    generator_key = (
+        model_type,
+        disease,
+        seed,
+        epochs,
+        batch_size,
+        len(train_data)
+    )
+
+    # Create a safe filename for the persisted model
+    model_filename = "_".join(str(x) for x in generator_key)
+    model_filename = "".join(
+        c if c.isalnum() or c in "._-" else "_"
+        for c in model_filename
+    )
+    model_path = os.path.join(
+        MODEL_CACHE_DIR,
+        f"{model_filename}.pkl"
+    )
+
+    # 1. Reuse model already loaded in memory
+    if generator_key in _generator_cache:
+        print("[i] Reusing existing trained model from memory. Skipping training.")
+        generator = _generator_cache[generator_key]
+
+    # 2. Otherwise, try loading the trained model from disk
+    elif os.path.exists(model_path):
+        print("[i] Saved model found. Loading model. Skipping training...")
+
+        generator = SyntheticDataGenerator(config=config)
+
+        try:
+            if model_type == 'CTGAN':
+                from src.engines.ctgan_engine import CTGANEngine
+
+                engine = CTGANEngine()
+                engine.load_model(model_path)
+                generator.model = engine
+                generator.model_type = model_type
+                generator.training_data = train_data.copy()
+
+            elif model_type == 'TVAE':
+                from src.engines.tvae_engine import TVAEEngine
+
+                engine = TVAEEngine()
+                engine.load_model(model_path)
+                generator.model = engine
+                generator.model_type = model_type
+                generator.training_data = train_data.copy()
+
+            _generator_cache[generator_key] = generator
+
+            print("[+] Saved model loaded successfully.")
+
+        except Exception as e:
+            print(f"[!] Could not load saved model: {e}")
+            print("[i] Training a new model...")
+
+            generator = SyntheticDataGenerator(config=config)
+            generator.train(train_data, config=config)
+            generator.save_model(model_path)
+            _generator_cache[generator_key] = generator
+
+    # 3. No saved model → train once and save it
+    else:
+        print("[i] No trained model found. Training...")
+
+        generator = SyntheticDataGenerator(config=config)
+        generator.train(train_data, config=config)
+
+        print("[i] Saving trained model...")
+        generator.save_model(model_path)
+
+        _generator_cache[generator_key] = generator
+
+        print("[+] Model saved for future runs.")
+
+    # Generate using the trained model
     synthetic = generator.generate(n_samples=n_samples)
 
     # Validation
@@ -199,7 +383,14 @@ def results():
 def datasets():
     """List all saved datasets."""
     all_ds = repo.list_datasets()
-    return render_template('datasets.html', datasets=all_ds)
+    quality_chart = build_metric_chart(all_ds, 'quality_score', '#2e8a7d')
+    privacy_chart = build_metric_chart(all_ds, 'privacy_score', '#7bb3a8')
+    return render_template(
+        'datasets.html',
+        datasets=all_ds,
+        quality_chart=quality_chart,
+        privacy_chart=privacy_chart,
+    )
 
 
 @app.route('/datasets/<dataset_id>/download')
@@ -220,6 +411,20 @@ def download_dataset(dataset_id):
     except FileNotFoundError:
         flash("Dataset not found.", "error")
         return redirect(url_for('datasets'))
+
+
+@app.route('/datasets/<dataset_id>/delete', methods=['POST'])
+def delete_dataset(dataset_id):
+    """Delete a saved dataset."""
+    try:
+        if repo.delete_dataset(dataset_id):
+            audit.log("delete", resource_id=dataset_id, details={"status": "deleted"})
+            flash("Dataset deleted successfully.", "success")
+        else:
+            flash("Dataset not found.", "error")
+    except Exception:
+        flash("Unable to delete dataset.", "error")
+    return redirect(url_for('datasets'))
 
 
 @app.route('/datasets/<dataset_id>')

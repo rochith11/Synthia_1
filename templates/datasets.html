@@ -1,50 +1,39 @@
 {% extends "base.html" %} {% block title %}Synthia | Datasets{% endblock %} {%
-block content %} {% set ns = namespace(q_sum=0, q_count=0, p_sum=0, p_count=0)
+block content %} {% set ns = namespace(q_sum=0, q_count=0, p_sum=0, p_count=0, q_max=0.0, p_max=0.0)
 %} {% for ds in datasets %} {% if ds.get('quality_score') is not none %} {% set
 ns.q_sum = ns.q_sum + ds.get('quality_score') %} {% set ns.q_count = ns.q_count
-+ 1 %} {% endif %} {% if ds.get('privacy_score') is not none %} {% set ns.p_sum
-= ns.p_sum + ds.get('privacy_score') %} {% set ns.p_count = ns.p_count + 1 %}
-{% endif %} {% endfor %}
++ 1 %} {% set ns.q_max = [ns.q_max, ds.get('quality_score')]|max %} {% endif %}
+{% if ds.get('privacy_score') is not none %} {% set ns.p_sum = ns.p_sum +
+ds.get('privacy_score') %} {% set ns.p_count = ns.p_count + 1 %} {% set
+ns.p_max = [ns.p_max, ds.get('privacy_score')]|max %} {% endif %} {% endfor %}
 
 <section class="hero compact" data-animate="rise">
-  <p class="eyebrow">Repository</p>
-  <h1 class="page-title">Saved Datasets</h1>
-  <p class="lead">
-    Browse generated artifacts, inspect lineage, and export files for downstream
-    analysis.
-  </p>
+  <h1 class="page-title">Saved Datasets <span style="display: inline-block; color: inherit; font-weight: 700; margin-left: 1rem; font-size: 0.9em;">{{ datasets|length }}</span></h1>
 </section>
 
-<section class="kpi-grid small" data-animate="rise">
-  <article class="kpi-card">
-    <p class="kpi-label">Datasets</p>
-    <p class="kpi-value metric-value" data-countup="{{ datasets|length }}">
-      {{ datasets|length }}
-    </p>
-  </article>
-  <article class="kpi-card">
-    <p class="kpi-label">Average Quality</p>
-    <p
-      class="kpi-value metric-value"
+<section class="mini-chart-grid" data-animate="rise">
+  <article class="mini-chart-card">
+    <div class="mini-chart-header">
+      <span>Average Quality</span>
       {% if ns.q_count %}
-      data-countup="{{ '%.3f'|format(ns.q_sum / ns.q_count) }}"
+      <strong>{{ "%.3f"|format(ns.q_sum / ns.q_count) }}</strong>
+      {% else %}
+      <strong>-</strong>
       {% endif %}
-    >
-      {% if ns.q_count %}{{ "%.3f"|format(ns.q_sum / ns.q_count) }}{% else
-      %}-{% endif %}
-    </p>
+    </div>
+    <div class="mini-chart-box">{{ quality_chart|safe }}</div>
   </article>
-  <article class="kpi-card">
-    <p class="kpi-label">Average Privacy</p>
-    <p
-      class="kpi-value metric-value"
+
+  <article class="mini-chart-card">
+    <div class="mini-chart-header">
+      <span>Average Privacy</span>
       {% if ns.p_count %}
-      data-countup="{{ '%.3f'|format(ns.p_sum / ns.p_count) }}"
+      <strong>{{ "%.3f"|format(ns.p_sum / ns.p_count) }}</strong>
+      {% else %}
+      <strong>-</strong>
       {% endif %}
-    >
-      {% if ns.p_count %}{{ "%.3f"|format(ns.p_sum / ns.p_count) }}{% else
-      %}-{% endif %}
-    </p>
+    </div>
+    <div class="mini-chart-box">{{ privacy_chart|safe }}</div>
   </article>
 </section>
 
@@ -53,7 +42,7 @@ ns.q_sum = ns.q_sum + ds.get('quality_score') %} {% set ns.q_count = ns.q_count
   <div class="table-wrap">
     <table>
       <tr>
-        <th>Name</th>
+        <th>Model</th>
         <th>Records</th>
         <th>Created</th>
         <th>Quality</th>
@@ -62,9 +51,9 @@ ns.q_sum = ns.q_sum + ds.get('quality_score') %} {% set ns.q_count = ns.q_count
       </tr>
       {% for ds in datasets %}
       <tr>
-        <td>{{ ds.get('dataset_name', 'unnamed') }}</td>
+        <td>{{ ds.get('dataset_name', 'unnamed').split('-')[0] }}</td>
         <td>{{ ds.get('n_records', '-') }}</td>
-        <td>{{ ds.get('created_at', '-')[:19] }}</td>
+        <td>{{ ds.get('created_at')|format_datetime }}</td>
         <td>
           {% if ds.get('quality_score') is not none %} {{
           "%.3f"|format(ds.quality_score) }} {% else %}
@@ -84,11 +73,40 @@ ns.q_sum = ns.q_sum + ds.get('quality_score') %} {% set ns.q_count = ns.q_count
               class="btn btn-sm btn-secondary"
               >View</a
             >
-            <a
-              href="{{ url_for('download_dataset', dataset_id=ds.dataset_id) }}"
-              class="btn btn-sm btn-primary"
-              >Download</a
+            <details class="download-dropdown">
+              <summary class="btn btn-sm btn-primary download-trigger">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="download-icon">
+                  <path d="M12 3v10.5m0 0 4-4m-4 4-4-4M4 17.5v1.5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1.5" />
+                </svg>
+                <span>Download</span>
+              </summary>
+              <div class="download-menu">
+                <a href="{{ url_for('download_dataset', dataset_id=ds.dataset_id, fmt='csv') }}" class="download-option">
+                  CSV
+                </a>
+                <a href="{{ url_for('download_dataset', dataset_id=ds.dataset_id, fmt='tsv') }}" class="download-option">
+                  TSV
+                </a>
+                <a href="{{ url_for('download_dataset', dataset_id=ds.dataset_id, fmt='xlsx') }}" class="download-option">
+                  XLSX
+                </a>
+              </div>
+            </details>
+            <form
+              method="post"
+              action="{{ url_for('delete_dataset', dataset_id=ds.dataset_id) }}"
+              class="delete-form"
+              onsubmit="return confirm('Delete {{ ds.get('dataset_name', 'this dataset') }}?');"
             >
+              <button
+                type="submit"
+                class="btn btn-sm btn-icon-only trash-trigger"
+                aria-label="Delete dataset"
+                title="Delete dataset"
+              >
+                <img src="{{ url_for('static', filename='dustbin.png') }}?v=1" alt="Delete" class="trash-icon" />
+              </button>
+            </form>
           </div>
         </td>
       </tr>
@@ -105,4 +123,89 @@ ns.q_sum = ns.q_sum + ds.get('quality_score') %} {% set ns.q_count = ns.q_count
   </p>
   <a href="{{ url_for('index') }}" class="btn btn-primary">Generate Dataset</a>
 </article>
-{% endif %} {% endblock %}
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<style>
+  .dataset-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    white-space: nowrap;
+  }
+
+  .dataset-actions .btn,
+  .dataset-actions details,
+  .dataset-actions form {
+    flex-shrink: 0;
+  }
+
+  .delete-form {
+    display: inline-flex;
+    margin: 0;
+  }
+
+  .trash-trigger {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+
+  .trash-trigger:hover {
+    background: rgba(15, 23, 42, 0.04);
+  }
+
+  .trash-icon {
+    width: 14px;
+    height: 14px;
+    display: block;
+    object-fit: contain;
+  }
+
+  .download-trigger {
+    padding-inline: 0.7rem;
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dropdowns = document.querySelectorAll('.download-dropdown');
+
+    dropdowns.forEach((dropdown) => {
+      const summary = dropdown.querySelector('summary');
+      const menu = dropdown.querySelector('.download-menu');
+
+      summary.addEventListener('click', function (event) {
+        event.preventDefault();
+        const isOpen = dropdown.hasAttribute('open');
+
+        dropdowns.forEach((item) => item.removeAttribute('open'));
+
+        if (!isOpen) {
+          dropdown.setAttribute('open', 'open');
+        }
+      });
+
+      if (menu) {
+        menu.addEventListener('click', function () {
+          dropdown.removeAttribute('open');
+        });
+      }
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!event.target.closest('.download-dropdown')) {
+        dropdowns.forEach((dropdown) => dropdown.removeAttribute('open'));
+      }
+    });
+  });
+</script>
+{% endblock %}

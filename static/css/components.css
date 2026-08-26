@@ -196,6 +196,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 0.9rem;
+  margin-bottom: 1.5rem;
 }
 
 .kpi-card {
@@ -212,6 +213,50 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin: 1rem 0 0;
+}
+
+.chart-row--bottom {
+  margin-top: 1rem;
+}
+
+.chart-panel {
+  background: color-mix(in srgb, var(--color-surface) 90%, #ffffff 10%);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.chart-panel h3 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.chart-box {
+  width: 100%;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .kpi-value {
@@ -254,14 +299,15 @@ table {
   border-collapse: collapse;
   font-size: 0.86rem;
   min-width: 560px;
+  table-layout: fixed;
 }
 
 th,
 td {
-  padding: 0.62rem 0.74rem;
-  text-align: left;
+  padding: 0.5rem 0.58rem;
+  text-align: center;
   border-bottom: 1px solid var(--color-border);
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 th {
@@ -270,6 +316,17 @@ th {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--color-text) 84%, #ffffff 16%);
+  text-align: center;
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+th:last-child,
+td:last-child {
+  text-align: center;
 }
 
 tbody tr:hover {
@@ -364,10 +421,121 @@ tbody tr:hover {
   gap: 0.45rem;
 }
 
+.mini-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0 1.8rem;
+}
+
+.mini-chart-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 0.95rem 1rem 1rem;
+}
+
+.mini-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.7rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.mini-chart-header strong {
+  font-size: 1.1rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text);
+}
+
+.mini-chart-box {
+  min-height: 120px;
+  background: linear-gradient(180deg, rgba(127, 178, 167, 0.04), rgba(127, 178, 167, 0.02));
+  border: 1px solid rgba(127, 178, 167, 0.12);
+  border-radius: 10px;
+  padding: 0.2rem 0.25rem 0.05rem;
+}
+
+.mini-chart-box svg {
+  display: block;
+  width: 100%;
+  height: 110px;
+}
+
 .dataset-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.download-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.download-dropdown summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.download-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.download-trigger {
   display: inline-flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 0.45rem;
+  padding-inline: 0.8rem;
+}
+
+.download-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.download-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.45rem);
+  min-width: 130px;
+  display: grid;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  z-index: 20;
+}
+
+.download-option {
+  display: block;
+  padding: 0.65rem 0.8rem;
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: #ffffff;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.download-option:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
 }
 
 .empty-state {

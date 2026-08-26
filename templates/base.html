@@ -26,8 +26,11 @@
     <header class="topbar">
       <div class="container topbar-inner">
         <a href="{{ url_for('index') }}" class="brand-mark">
-          <span class="brand-badge">S</span>
-          <span class="brand-text">Synthia Studio</span>
+          <img
+            src="{{ url_for('static', filename='logo-cropped.jpeg') }}"
+            alt="Synthia"
+            class="brand-logo"
+          />
         </a>
 
         <button

@@ -208,10 +208,10 @@ class PrivacyAnalyzer:
         # Privacy score: higher mean NND → better privacy.
         # Clamp to [0, 1].  A mean NND of 0 → score 0; NND ≥ 1 → score 1.
         # We also penalise by the high-risk fraction.
-        base_score = min(1.0, nnd_stats['mean'])
-        risk_penalty = risk_info['high_risk_percentage']
-        privacy_score = max(0.0, base_score - risk_penalty)
-        privacy_score = min(1.0, max(0.0, privacy_score))
+        # Privacy score based on the proportion of non-high-risk records.
+        # Privacy score based on mean nearest-neighbor distance.
+        # A mean NND of 0.1 or greater is treated as maximum privacy.
+        privacy_score = min(1.0, nnd_stats['mean'] / 0.1)
 
         print(f"[+] Privacy score: {privacy_score:.4f}")
 

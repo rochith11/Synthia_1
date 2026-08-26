@@ -131,6 +131,23 @@ class DatasetRepository:
         return out_path
 
     # ------------------------------------------------------------------
+    # Delete
+    # ------------------------------------------------------------------
+
+    def delete_dataset(self, dataset_id: str) -> bool:
+        """Delete a saved dataset and its metadata."""
+        csv_path = os.path.join(self.base_dir, f"{dataset_id}.csv")
+        meta_path = os.path.join(self.base_dir, f"{dataset_id}_metadata.json")
+
+        removed = False
+        for path in (csv_path, meta_path):
+            if os.path.exists(path):
+                os.remove(path)
+                removed = True
+
+        return removed
+
+    # ------------------------------------------------------------------
     # List
     # ------------------------------------------------------------------
 

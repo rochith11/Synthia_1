@@ -17,12 +17,11 @@ class SyntheticDataGenerator:
 
     # List of discrete columns in variant metadata
     DISCRETE_COLUMNS = [
-        'gene_symbol',
-        'chromosome',
-        'variant_type',
-        'clinical_significance',
-        'disease',
-        'inheritance_pattern'
+    'gene_symbol',
+    'chromosome',
+    'clinical_significance',
+    'disease',
+    'inheritance_pattern'
     ]
 
     def __init__(self, config: Optional[GenerationConfig] = None, random_seed: int = 42):
@@ -148,9 +147,12 @@ class SyntheticDataGenerator:
             synthetic: DataFrame to validate
         """
         required_fields = [
-            'gene_symbol', 'chromosome', 'variant_type',
-            'clinical_significance', 'disease',
-            'allele_frequency', 'inheritance_pattern'
+            'gene_symbol',
+            'chromosome',
+            'clinical_significance',
+            'disease',
+            'allele_frequency',
+            'inheritance_pattern'
         ]
 
         # Check all fields present

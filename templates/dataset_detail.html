@@ -27,7 +27,7 @@
       </div>
       <div>
         <dt>Created</dt>
-        <dd>{{ meta.get('created_at', '-') }}</dd>
+        <dd>{{ meta.get('created_at')|format_datetime }}</dd>
       </div>
       <div>
         <dt>Model</dt>
