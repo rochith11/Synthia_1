@@ -16,7 +16,7 @@ warnings.filterwarnings('ignore')
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify
 
 from src.utils.config_manager import ConfigManager
-from src.utils.data_loader import load_training_data, load_test_data, create_sample_data
+from src.utils.data_loader import load_training_data, load_test_data
 # Support different import paths (IDE vs runtime)
 try:
     from src.models.generation_config import GenerationConfig
