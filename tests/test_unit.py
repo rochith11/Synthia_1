@@ -225,6 +225,34 @@ class TestDataValidator:
         assert 'synthetic_to_real' in result
         assert 'real_to_synthetic' in result
 
+    def test_auc_with_missing_test_classes(self):
+        rng = np.random.RandomState(42)
+
+        synthetic_train = pd.DataFrame({
+            'signal': np.concatenate([
+                rng.normal(0.1, 0.01, 30),
+                rng.normal(0.5, 0.01, 30),
+                rng.normal(0.9, 0.01, 30),
+            ]),
+            'gene_symbol': ['G1'] * 30 + ['G2'] * 30 + ['G3'] * 30,
+            'disease': ['A'] * 30 + ['B'] * 30 + ['C'] * 30,
+        })
+
+        real_test = pd.DataFrame({
+            'signal': np.concatenate([
+                rng.normal(0.1, 0.01, 20),
+                rng.normal(0.5, 0.01, 20),
+            ]),
+            'gene_symbol': ['G1'] * 20 + ['G2'] * 20,
+            'disease': ['A'] * 20 + ['B'] * 20,
+        })
+
+        metrics = self.validator.evaluate_ml_utility(
+            synthetic_train, real_test, target_column='disease'
+        )
+
+        assert 0.0 < metrics['auc'] <= 1.0
+
     def test_rare_events_with_threshold(self):
         # Make one class very rare in real data
         real = self.real.copy()

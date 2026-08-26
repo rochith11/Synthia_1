@@ -5,7 +5,7 @@ import pandas as pd
 from typing import Dict, Any
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, label_binarize
 
 from src.analysis.statistical_analyzer import StatisticalAnalyzer
 from src.models.reports import ValidationReport
@@ -89,17 +89,58 @@ class DataValidator:
 
         auc = 0.0
         if n_classes > 1:
-            try:
-                y_proba = clf.predict_proba(X_test)
-                auc = roc_auc_score(y_test, y_proba, multi_class='ovr', average='weighted')
-            except (ValueError, IndexError):
-                auc = 0.0
+            y_proba = clf.predict_proba(X_test)
+            auc = self._compute_weighted_auc(y_test, y_proba, clf.classes_)
 
         return {
             'accuracy': float(acc),
             'f1_score': float(f1),
             'auc': float(auc)
         }
+
+    def _compute_weighted_auc(self, y_true: np.ndarray, y_proba: np.ndarray,
+                              class_labels: np.ndarray) -> float:
+        """Compute robust weighted AUC, tolerating class absence in test data.
+
+        ``roc_auc_score`` can fail for multiclass tasks when some classes exist
+        in training (and therefore in ``predict_proba`` outputs) but are absent
+        in the current test fold. We compute one-vs-rest AUC per class and
+        aggregate only classes that have both positive and negative examples.
+        """
+        if y_proba.ndim != 2 or y_proba.shape[1] != len(class_labels):
+            return 0.0
+
+        if len(np.unique(y_true)) < 2:
+            return 0.0
+
+        # Binary special-case: use the positive-class probability directly.
+        if len(class_labels) == 2:
+            positive_class = class_labels[1]
+            y_true_binary = (y_true == positive_class).astype(int)
+            if len(np.unique(y_true_binary)) < 2:
+                return 0.0
+            return float(roc_auc_score(y_true_binary, y_proba[:, 1]))
+
+        # Multiclass: weighted OVR over classes that are evaluable in y_true.
+        y_true_bin = label_binarize(y_true, classes=class_labels)
+
+        auc_scores = []
+        weights = []
+        for class_idx in range(len(class_labels)):
+            y_class = y_true_bin[:, class_idx]
+            positives = int(y_class.sum())
+            negatives = len(y_class) - positives
+            if positives == 0 or negatives == 0:
+                continue
+
+            class_auc = roc_auc_score(y_class, y_proba[:, class_idx])
+            auc_scores.append(float(class_auc))
+            weights.append(float(positives))
+
+        if not auc_scores:
+            return 0.0
+
+        return float(np.average(auc_scores, weights=np.array(weights)))
 
     def cross_test(self, synthetic: pd.DataFrame, real: pd.DataFrame,
                    target_column: str) -> Dict[str, Dict[str, float]]:
